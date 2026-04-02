@@ -10,8 +10,8 @@
       --text: #f2ece4;
       --text-muted: rgba(242, 236, 228, 0.55);
       --contact-muted: #888888;
-      --gap: 1.5rem;
-      --max: 1400px;
+      --gap: clamp(14px, 1.35vw, 22px);
+      --max: min(100%, 1800px);
     }
 
     *,
@@ -39,7 +39,7 @@
     .page {
       max-width: var(--max);
       margin: 0 auto;
-      padding: clamp(1.25rem, 4vw, 2.5rem) clamp(1.25rem, 5vw, 3rem) clamp(4rem, 12vw, 7rem);
+      padding: clamp(0.625rem, 2vw, 1.25rem) clamp(1.25rem, 5vw, 3rem) clamp(4rem, 12vw, 7rem);
     }
 
     header {
@@ -49,8 +49,8 @@
     .name {
       margin: 0;
       font-size: clamp(3.375rem, 7.5vw, 4.05rem);
-      font-weight: 200;
-      letter-spacing: 0.04em;
+      font-weight: 100;
+      letter-spacing: 0.06em;
       line-height: 1.1;
     }
 
@@ -103,14 +103,14 @@
     }
 
     .caption {
-      margin-top: 0.85rem;
+      margin-top: clamp(0.5rem, 1.2vw, 0.75rem);
       font-size: 0.8125rem;
       color: var(--text-muted);
       letter-spacing: 0.04em;
     }
 
     .contact {
-      margin-top: clamp(2.65rem, 8vw, 4.65rem);
+      margin-top: clamp(1.77rem, 5.33vw, 3.1rem);
       max-width: 36rem;
     }
 
@@ -159,14 +159,15 @@
     }
 
     #detail {
-      width: min(100vw - 2rem, 1200px);
-      max-width: 1200px;
+      width: min(100vw - 2rem, 1920px);
+      max-width: 1920px;
       max-height: min(96vh, 100%);
       margin: auto;
       padding: 0;
       border: none;
       background: var(--bg);
       color: var(--text);
+      overflow: hidden;
     }
 
     #detail::backdrop {
@@ -178,14 +179,17 @@
       max-height: min(96vh, 100%);
       overflow-y: auto;
       overflow-x: hidden;
+      overscroll-behavior: contain;
       scrollbar-width: none;
       -ms-overflow-style: none;
     }
 
-    .detail-inner::-webkit-scrollbar {
+    .detail-inner::-webkit-scrollbar,
+    #detail::-webkit-scrollbar {
       display: none;
-      width: 0;
-      height: 0;
+      width: 0 !important;
+      height: 0 !important;
+      background: transparent;
     }
 
     .detail-top {
@@ -201,7 +205,9 @@
     }
 
     #detail-body {
-      padding: 0 clamp(0.5rem, 2vw, 1rem);
+      padding: 0;
+      max-width: 1920px;
+      margin: 0 auto;
     }
 
     .detail-footer {
@@ -244,8 +250,9 @@
     .detail-video {
       position: relative;
       width: 100%;
+      max-width: 1920px;
+      margin: 0 auto 0;
       aspect-ratio: 16 / 9;
-      margin: 0 0 0;
       overflow: hidden;
       background: #111;
     }
@@ -266,7 +273,6 @@
     .detail-figure img {
       display: block;
       width: 100%;
-      max-width: 100%;
       height: auto;
     }
 
@@ -626,10 +632,21 @@
         }
       }
 
+      function lockPageScroll(lock) {
+        var v = lock ? "hidden" : "";
+        document.documentElement.style.overflow = v;
+        document.body.style.overflow = v;
+      }
+
+      dialogEl.addEventListener("close", function () {
+        lockPageScroll(false);
+      });
+
       document.querySelectorAll(".work-trigger").forEach(function (btn) {
         btn.addEventListener("click", function () {
           var id = btn.getAttribute("data-project");
           renderProject(id);
+          lockPageScroll(true);
           dialogEl.showModal();
         });
       });
