@@ -10,8 +10,8 @@
       --text: #f2ece4;
       --text-muted: rgba(242, 236, 228, 0.55);
       --contact-muted: #888888;
-      --gap: clamp(1rem, 2.5vw, 2rem);
-      --max: 1200px;
+      --gap: 1.5rem;
+      --max: 1400px;
     }
 
     *,
@@ -39,7 +39,7 @@
     .page {
       max-width: var(--max);
       margin: 0 auto;
-      padding: clamp(2.5rem, 8vw, 5rem) clamp(1.25rem, 5vw, 3rem) clamp(4rem, 12vw, 7rem);
+      padding: clamp(1.25rem, 4vw, 2.5rem) clamp(1.25rem, 5vw, 3rem) clamp(4rem, 12vw, 7rem);
     }
 
     header {
@@ -49,7 +49,7 @@
     .name {
       margin: 0;
       font-size: clamp(3.375rem, 7.5vw, 4.05rem);
-      font-weight: 500;
+      font-weight: 200;
       letter-spacing: 0.04em;
       line-height: 1.1;
     }
@@ -83,7 +83,7 @@
 
     .thumb {
       position: relative;
-      aspect-ratio: 4 / 3;
+      aspect-ratio: 1 / 1;
       overflow: hidden;
       background: #111;
     }
@@ -109,14 +109,8 @@
       letter-spacing: 0.04em;
     }
 
-    .caption .year {
-      display: block;
-      margin-top: 0.2rem;
-      opacity: 0.85;
-    }
-
     .contact {
-      margin-top: clamp(4rem, 12vw, 7rem);
+      margin-top: clamp(2.65rem, 8vw, 4.65rem);
       max-width: 36rem;
     }
 
@@ -165,12 +159,12 @@
     }
 
     #detail {
-      max-width: 960px;
-      width: min(92vw, 960px);
-      max-height: 90vh;
+      width: min(100vw - 2rem, 1200px);
+      max-width: 1200px;
+      max-height: min(96vh, 100%);
       margin: auto;
       padding: 0;
-      border: 1px solid #2a2a2a;
+      border: none;
       background: var(--bg);
       color: var(--text);
     }
@@ -180,16 +174,22 @@
     }
 
     .detail-inner {
-      padding: clamp(1.25rem, 4vw, 2rem);
-      max-height: 90vh;
-      overflow: auto;
+      padding: clamp(1rem, 3vw, 1.5rem) 0 clamp(1.25rem, 3vw, 2rem);
+      max-height: min(96vh, 100%);
+      overflow-y: auto;
+      overflow-x: hidden;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    .detail-inner::-webkit-scrollbar {
+      display: none;
+      width: 0;
+      height: 0;
     }
 
     .detail-top {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 1rem;
+      padding: 0 clamp(0.5rem, 2vw, 1rem);
       margin-bottom: 1.25rem;
     }
 
@@ -200,23 +200,38 @@
       letter-spacing: 0.03em;
     }
 
-    .detail-close {
-      flex-shrink: 0;
-      width: 2.25rem;
-      height: 2.25rem;
-      border: 1px solid #3a3a3a;
-      background: transparent;
-      color: var(--text-muted);
-      font-size: 1.25rem;
-      line-height: 1;
-      cursor: pointer;
-      border-radius: 2px;
+    #detail-body {
+      padding: 0 clamp(0.5rem, 2vw, 1rem);
     }
 
-    .detail-close:hover,
-    .detail-close:focus-visible {
+    .detail-footer {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.25rem 2rem;
+      justify-content: flex-start;
+      align-items: center;
+      margin-top: 2rem;
+      padding: 1.5rem clamp(0.5rem, 2vw, 1rem) 0;
+      border-top: 1px solid #2a2a2a;
+    }
+
+    .detail-footer button {
+      margin: 0;
+      padding: 0;
+      border: none;
+      background: none;
+      color: var(--text-muted);
+      font: inherit;
+      font-size: 0.8125rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .detail-footer button:hover,
+    .detail-footer button:focus-visible {
       color: var(--text);
-      border-color: #666;
     }
 
     .detail-note {
@@ -230,7 +245,7 @@
       position: relative;
       width: 100%;
       aspect-ratio: 16 / 9;
-      margin: 0 0 1.25rem;
+      margin: 0 0 0;
       overflow: hidden;
       background: #111;
     }
@@ -244,16 +259,14 @@
     }
 
     .detail-figure {
-      margin: 0 0 1rem;
-    }
-
-    .detail-figure:last-child {
-      margin-bottom: 0;
+      margin: 0;
+      display: block;
     }
 
     .detail-figure img {
       display: block;
       width: 100%;
+      max-width: 100%;
       height: auto;
     }
 
@@ -281,140 +294,140 @@
         <button type="button" class="work-trigger" data-project="slot-game">
           <div class="thumb">
             <img
-              src="https://cdn.myportfolio.com/197a6bd9-dcd9-42d3-8e20-5e24d83ae321/1b00eab6-0ead-47c7-951c-2cd3bb551c0a_rw_1200.png?h=a22458e8bbdfcd6b20e6568df678be15"
+              src="https://cdn.myportfolio.com/197a6bd9-dcd9-42d3-8e20-5e24d83ae321/9242c6dc-ac21-4fe9-965b-66db5717d744_rwc_461x253x996x778x996.png?h=75c0ac279b0d9625a763413d8c20e514"
               alt="Slot Game"
               width="800"
-              height="600"
+              height="800"
               loading="lazy"
             />
           </div>
-          <p class="caption">Slot Game<span class="year">2026</span></p>
+          <p class="caption">Slot Game</p>
         </button>
       </li>
       <li class="work">
         <button type="button" class="work-trigger" data-project="squid-game-unleashed">
           <div class="thumb">
             <img
-              src="https://cdn.myportfolio.com/197a6bd9-dcd9-42d3-8e20-5e24d83ae321/248059ea-f72c-4ba9-b4ce-3ae3917e0615_rw_1200.jpg?h=db7f5ec8924fa7daeb6d0272c55ab168"
+              src="https://cdn.myportfolio.com/197a6bd9-dcd9-42d3-8e20-5e24d83ae321/514bf836-55ad-4b80-bf04-f9c41ebd0a4e_car_202x158.jpg?h=d410549756f8bea6086bb060852c70cf"
               alt="Squid Game Unleashed"
               width="800"
-              height="600"
+              height="800"
               loading="lazy"
             />
           </div>
-          <p class="caption">Squid Game Unleashed<span class="year">2025</span></p>
+          <p class="caption">Squid Game Unleashed</p>
         </button>
       </li>
       <li class="work">
         <button type="button" class="work-trigger" data-project="marvel-world-of-heroes">
           <div class="thumb">
             <img
-              src="https://cdn.myportfolio.com/197a6bd9-dcd9-42d3-8e20-5e24d83ae321/cfd9c5c9-498f-471a-a5aa-f2fbc050a0c2_rw_1200.png?h=9b56b12134ddf62305805b2a6e474fbb"
+              src="https://cdn.myportfolio.com/197a6bd9-dcd9-42d3-8e20-5e24d83ae321/d7767aa5-0e65-49c0-858d-78708e8928e8_car_202x158.png?h=b09d22b1002ec149755b8d0124411c51"
               alt="Marvel World Of Heroes"
               width="800"
-              height="600"
+              height="800"
               loading="lazy"
             />
           </div>
-          <p class="caption">Marvel World Of Heroes<span class="year">2023</span></p>
+          <p class="caption">Marvel World Of Heroes</p>
         </button>
       </li>
       <li class="work">
         <button type="button" class="work-trigger" data-project="magic-spellslingers">
           <div class="thumb">
             <img
-              src="https://cdn.myportfolio.com/197a6bd9-dcd9-42d3-8e20-5e24d83ae321/6b2ccecf-abe0-48b3-8f80-c396095598c1_rw_1200.png?h=9a0e1a0551a4ddf1f3945f56d2056da5"
+              src="https://cdn.myportfolio.com/197a6bd9-dcd9-42d3-8e20-5e24d83ae321/58c90e5a-1dea-4ade-91ab-9512ef09d0c0_rwc_1159x381x1527x1193x1527.png?h=46a54a1699f206c8f6ad1a420cb9901f"
               alt="Magic Spellslingers"
               width="800"
-              height="600"
+              height="800"
               loading="lazy"
             />
           </div>
-          <p class="caption">Magic Spellslingers<span class="year">2023</span></p>
+          <p class="caption">Magic Spellslingers</p>
         </button>
       </li>
       <li class="work">
         <button type="button" class="work-trigger" data-project="gothic-style-ui-design">
           <div class="thumb">
             <img
-              src="https://cdn.myportfolio.com/197a6bd9-dcd9-42d3-8e20-5e24d83ae321/e25effee-bc3c-4872-acf1-cb52476bfce8_rw_1200.jpg?h=e13d74cb14920e37be053df427113667"
+              src="https://cdn.myportfolio.com/197a6bd9-dcd9-42d3-8e20-5e24d83ae321/d21433de-5717-4cc7-94eb-715501193ec7_rwc_171x11x856x669x856.jpg?h=5dd46741081334d8dc9bfc896ad4e559"
               alt="Gothic Style UI Design"
               width="800"
-              height="600"
+              height="800"
               loading="lazy"
             />
           </div>
-          <p class="caption">Gothic Style UI Design<span class="year">2016</span></p>
+          <p class="caption">Gothic Style UI Design</p>
         </button>
       </li>
       <li class="work">
         <button type="button" class="work-trigger" data-project="chinese-style-ui-design">
           <div class="thumb">
             <img
-              src="https://cdn.myportfolio.com/197a6bd9-dcd9-42d3-8e20-5e24d83ae321/8a81cb66-1d03-41f8-8026-539a07b92a2e_rw_1200.jpg?h=5b1525fc8e9076c01ef70455bad678e2"
+              src="https://cdn.myportfolio.com/197a6bd9-dcd9-42d3-8e20-5e24d83ae321/63e07ed7-589e-469e-ad88-6ea7b6fcf112_rwc_304x11x836x654x836.jpg?h=4dfad265046e12944334e160852d0669"
               alt="Chinese Style UI Design"
               width="800"
-              height="600"
+              height="800"
               loading="lazy"
             />
           </div>
-          <p class="caption">Chinese Style UI Design<span class="year">2016</span></p>
+          <p class="caption">Chinese Style UI Design</p>
         </button>
       </li>
       <li class="work">
         <button type="button" class="work-trigger" data-project="phantom-tribe">
           <div class="thumb">
             <img
-              src="https://cdn.myportfolio.com/197a6bd9-dcd9-42d3-8e20-5e24d83ae321/300dc376-7587-44e6-bfd8-e1f6c4a2a0fa_rw_1200.jpg?h=8678f1dd1f0f14bdefbb5100e5bc820c"
+              src="https://cdn.myportfolio.com/197a6bd9-dcd9-42d3-8e20-5e24d83ae321/453515d0-114c-4694-b990-1e7b38ff91ab_rwc_83x46x512x400x512.png?h=b183088ef55485a3b722bd8a618bf59d"
               alt="Phantom Tribe"
               width="800"
-              height="600"
+              height="800"
               loading="lazy"
             />
           </div>
-          <p class="caption">Phantom Tribe<span class="year">2016</span></p>
+          <p class="caption">Phantom Tribe</p>
         </button>
       </li>
       <li class="work">
         <button type="button" class="work-trigger" data-project="cute-style-ui-design">
           <div class="thumb">
             <img
-              src="https://cdn.myportfolio.com/197a6bd9-dcd9-42d3-8e20-5e24d83ae321/387d1f0a-56d6-4220-8708-a0ab13025a3e_rw_1200.jpg?h=f3af884b2119582eba38f450bad6ed7c"
+              src="https://cdn.myportfolio.com/197a6bd9-dcd9-42d3-8e20-5e24d83ae321/ec91fb55-62ce-4513-b4ce-12c3c53e740d_rwc_150x409x523x409x523.jpg?h=26e4223122d61abb3ad3ca9b337da2b9"
               alt="Cute Style UI Design"
               width="800"
-              height="600"
+              height="800"
               loading="lazy"
             />
           </div>
-          <p class="caption">Cute Style UI Design<span class="year">2016</span></p>
+          <p class="caption">Cute Style UI Design</p>
         </button>
       </li>
       <li class="work">
         <button type="button" class="work-trigger" data-project="coiling-dragons-game-hall">
           <div class="thumb">
             <img
-              src="https://cdn.myportfolio.com/197a6bd9-dcd9-42d3-8e20-5e24d83ae321/eb3d4c04-1421-4fa4-b991-8d18028514e9_rw_1200.jpg?h=c40b8573e30e9c76f104536bb4b7837b"
+              src="https://cdn.myportfolio.com/197a6bd9-dcd9-42d3-8e20-5e24d83ae321/b5104a91-fbd2-4e54-b192-3e74dc4d0c79_rwc_272x36x665x520x665.jpg?h=05f35de35567119e573a28f215b22c79"
               alt="Coiling Dragons Game Hall"
               width="800"
-              height="600"
+              height="800"
               loading="lazy"
             />
           </div>
-          <p class="caption">Coiling Dragons Game Hall<span class="year">2017</span></p>
+          <p class="caption">Coiling Dragons Game Hall</p>
         </button>
       </li>
       <li class="work">
         <button type="button" class="work-trigger" data-project="music-ninja">
           <div class="thumb">
             <img
-              src="https://cdn.myportfolio.com/197a6bd9-dcd9-42d3-8e20-5e24d83ae321/4ceeebad-d91a-446a-babf-25903ae7e4e6_rw_1200.jpg?h=14abce9c631b746042a3fc2c8d1e1005"
+              src="https://cdn.myportfolio.com/197a6bd9-dcd9-42d3-8e20-5e24d83ae321/8dddc77f-bd9e-4947-9e73-112b47853516_car_202x158.png?h=c9add6587ac0a2705402597ec7d72ac8"
               alt="Music Ninja"
               width="800"
-              height="600"
+              height="800"
               loading="lazy"
             />
           </div>
-          <p class="caption">Music Ninja<span class="year">2016</span></p>
+          <p class="caption">Music Ninja</p>
         </button>
       </li>
     </ul>
@@ -432,12 +445,15 @@
   </div>
 
   <dialog id="detail">
-    <div class="detail-inner">
+    <div class="detail-inner" id="detail-scroll">
       <div class="detail-top">
         <h2 class="detail-title" id="detail-title"></h2>
-        <button type="button" class="detail-close" id="detail-close" aria-label="Close">×</button>
       </div>
       <div id="detail-body"></div>
+      <div class="detail-footer">
+        <button type="button" id="detail-back-top">Back to Top</button>
+        <button type="button" id="detail-close-bottom">Close</button>
+      </div>
     </div>
   </dialog>
 
@@ -448,9 +464,9 @@
           title: "Slot Game",
           videos: [],
           images: [
-            "https://cdn.myportfolio.com/197a6bd9-dcd9-42d3-8e20-5e24d83ae321/1b00eab6-0ead-47c7-951c-2cd3bb551c0a_rw_1200.png?h=a22458e8bbdfcd6b20e6568df678be15",
-            "https://cdn.myportfolio.com/197a6bd9-dcd9-42d3-8e20-5e24d83ae321/de0a3a49-a8e6-4a75-a79b-0762e28245d3_rw_1200.png?h=2df291c5ff5086a10911635c60ef3d2a",
-            "https://cdn.myportfolio.com/197a6bd9-dcd9-42d3-8e20-5e24d83ae321/7c1e3e16-be4a-44e1-9024-a97214cd3275_rw_1200.png?h=7acfa9b030050d3b8f95a113d11bd944"
+            "https://cdn.myportfolio.com/197a6bd9-dcd9-42d3-8e20-5e24d83ae321/1b00eab6-0ead-47c7-951c-2cd3bb551c0a_rw_1920.png?h=65c2fd7a7eb93f8e15c8763d7f4d6557",
+            "https://cdn.myportfolio.com/197a6bd9-dcd9-42d3-8e20-5e24d83ae321/de0a3a49-a8e6-4a75-a79b-0762e28245d3_rw_1920.png?h=48ad7a5ff0d580e9a260c65caf2c4869",
+            "https://cdn.myportfolio.com/197a6bd9-dcd9-42d3-8e20-5e24d83ae321/7c1e3e16-be4a-44e1-9024-a97214cd3275_rw_1920.png?h=6b17c6b5109db965ee676c63089110fc"
           ]
         },
         "squid-game-unleashed": {
@@ -571,9 +587,11 @@
       };
 
       var dialogEl = document.getElementById("detail");
+      var scrollEl = document.getElementById("detail-scroll");
       var titleEl = document.getElementById("detail-title");
       var bodyEl = document.getElementById("detail-body");
-      var closeBtn = document.getElementById("detail-close");
+      var closeBottomBtn = document.getElementById("detail-close-bottom");
+      var backTopBtn = document.getElementById("detail-back-top");
 
       function renderProject(id) {
         var p = PROJECTS[id];
@@ -603,6 +621,9 @@
             '" alt="" loading="lazy" /></figure>';
         }
         bodyEl.innerHTML = html;
+        if (scrollEl) {
+          scrollEl.scrollTop = 0;
+        }
       }
 
       document.querySelectorAll(".work-trigger").forEach(function (btn) {
@@ -613,8 +634,14 @@
         });
       });
 
-      closeBtn.addEventListener("click", function () {
+      closeBottomBtn.addEventListener("click", function () {
         dialogEl.close();
+      });
+
+      backTopBtn.addEventListener("click", function () {
+        if (scrollEl) {
+          scrollEl.scrollTo({ top: 0, behavior: "smooth" });
+        }
       });
 
       dialogEl.addEventListener("click", function (e) {
