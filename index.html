@@ -10,11 +10,10 @@
       --text: #f2ece4;
       --text-muted: rgba(242, 236, 228, 0.55);
       --contact-muted: #888888;
-      --thumb-w: 610px;
-      --thumb-h: 480px;
-      --grid-gap-x: 26px;
-      --grid-gap-y: 52px;
-      --max: min(100%, calc(var(--thumb-w) * 3 + var(--grid-gap-x) * 2));
+      /* Adobe Portfolio: .site-container { max-width: 1400px } */
+      --site-max: 1400px;
+      /* .project-cover: width 29%; margin-right: 6.5%; hold-space aspect padding-bottom */
+      --cover-aspect-pad: 78.21782%;
     }
 
     *,
@@ -39,8 +38,8 @@
       letter-spacing: 0.01em;
     }
 
-    .page {
-      max-width: var(--max);
+    #page-root .page {
+      max-width: var(--site-max);
       margin: 0 auto;
       padding: clamp(0.625rem, 2vw, 1.25rem) clamp(1.25rem, 5vw, 3rem) clamp(4rem, 12vw, 7rem);
     }
@@ -57,22 +56,24 @@
       line-height: 1.1;
     }
 
+    /* .project-covers { display: flex; flex-wrap: wrap; padding-top: 40px; } */
     .works {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, var(--thumb-w)));
-      column-gap: var(--grid-gap-x);
-      row-gap: var(--grid-gap-y);
+      display: flex;
+      flex-wrap: wrap;
       list-style: none;
       margin: 0;
-      padding: 0;
-      justify-content: center;
+      padding: 40px 0 0;
     }
 
     .work {
-      margin: 0;
-      width: 100%;
-      max-width: var(--thumb-w);
-      justify-self: center;
+      box-sizing: border-box;
+      width: 29%;
+      margin-right: 6.5%;
+      margin-bottom: 0;
+    }
+
+    .work:nth-child(3n) {
+      margin-right: 0;
     }
 
     .work-trigger {
@@ -89,16 +90,24 @@
       outline-offset: 4px;
     }
 
+    /* .project-cover.hold-space .cover-image:before { padding-bottom: 78.21782%; } */
     .thumb {
       position: relative;
       width: 100%;
-      max-width: var(--thumb-w);
-      aspect-ratio: 610 / 480;
       overflow: hidden;
       background: #111;
     }
 
+    .thumb::before {
+      content: "";
+      display: block;
+      padding-bottom: var(--cover-aspect-pad);
+    }
+
     .thumb img {
+      position: absolute;
+      left: 0;
+      top: 0;
       width: 100%;
       height: 100%;
       object-fit: cover;
@@ -112,11 +121,15 @@
       transform: scale(1.02);
     }
 
+    /* .project-cover .details-wrap { padding-top: 4.5%; } */
     .caption {
-      margin-top: clamp(0.5rem, 1.2vw, 0.75rem);
+      margin: 0 auto;
+      padding-top: 4.5%;
       font-size: 0.8125rem;
       color: var(--text-muted);
       letter-spacing: 0.04em;
+      text-align: center;
+      width: 90%;
     }
 
     .contact {
@@ -168,40 +181,27 @@
       text-underline-offset: 0.2em;
     }
 
-    #detail {
-      position: fixed;
-      inset: 0;
-      width: 100%;
-      max-width: none;
-      height: 100%;
-      max-height: none;
-      margin: 0;
-      padding: 0;
-      border: none;
+    /*
+      Marvel / project pages: body scroll + .site-container max-width 1400px.
+      Single overlay uses document scrolling (native right scrollbar like Adobe).
+    */
+    .project-view {
       background: var(--bg);
       color: var(--text);
-      overflow-x: hidden;
-      overflow-y: auto;
-      overscroll-behavior: contain;
-    }
-
-    #detail::backdrop {
-      background: rgba(0, 0, 0, 0.78);
+      min-height: 100vh;
     }
 
     .detail-inner {
-      padding: clamp(1.25rem, 4vw, 2rem) 0 clamp(2rem, 5vw, 3rem);
-      margin: 0;
-      overflow: visible;
+      box-sizing: border-box;
+      max-width: var(--site-max);
+      margin: 0 auto;
+      padding: clamp(1.25rem, 4vw, 2rem) 0 clamp(3rem, 8vw, 5rem);
     }
 
     .detail-top {
       box-sizing: border-box;
-      max-width: 1920px;
-      margin-left: auto;
-      margin-right: auto;
-      padding: 0 clamp(1.25rem, 5vw, 2.5rem);
       margin-bottom: clamp(1rem, 3vw, 1.5rem);
+      padding: 0 clamp(1.25rem, 5vw, 2.5rem);
     }
 
     .detail-title {
@@ -214,7 +214,6 @@
     #detail-body {
       padding: 0;
       width: 100%;
-      max-width: none;
       margin: 0;
     }
 
@@ -225,9 +224,6 @@
       gap: 1.25rem 2.5rem;
       justify-content: center;
       align-items: center;
-      max-width: 1920px;
-      margin-left: auto;
-      margin-right: auto;
       margin-top: clamp(2rem, 5vw, 3rem);
       padding: 1.75rem clamp(1.25rem, 5vw, 2.5rem) 0;
       border-top: 1px solid #2a2a2a;
@@ -258,15 +254,14 @@
       font-size: 0.9375rem;
       line-height: 1.6;
       color: var(--text-muted);
-      max-width: 1920px;
-      box-sizing: border-box;
     }
 
+    /* Marvel embed: style="max-width: 1280px; max-height: 720px; margin: 0 auto;" */
     .detail-video {
       position: relative;
       width: 100%;
-      max-width: none;
-      margin: 0;
+      max-width: 1280px;
+      margin: 0 auto;
       aspect-ratio: 16 / 9;
       overflow: hidden;
       background: #111;
@@ -285,26 +280,51 @@
       display: block;
     }
 
+    /* .page img { display: block; margin: 0 auto; max-width: 100%; } */
     .detail-figure img {
       display: block;
+      margin: 0 auto;
+      max-width: 100%;
       width: 100%;
       height: auto;
     }
 
-    @media (max-width: 1300px) {
+    @media (max-width: 932px) {
+      .work {
+        width: 46.75%;
+      }
+
+      .work:nth-child(2n) {
+        margin-right: 0 !important;
+      }
+
+      .work:nth-child(3n) {
+        margin-right: 6.5%;
+      }
+
+      .work:nth-child(3n + 1) {
+        clear: none;
+      }
+
       .works {
-        grid-template-columns: repeat(2, minmax(0, var(--thumb-w)));
+        padding-top: 20px;
       }
     }
 
-    @media (max-width: 700px) {
+    @media (max-width: 540px) {
+      .work {
+        margin-right: 0 !important;
+        width: 100%;
+      }
+
       .works {
-        grid-template-columns: minmax(0, var(--thumb-w));
+        padding-top: 18px;
       }
     }
   </style>
 </head>
 <body>
+  <div id="page-root">
   <div class="page">
     <header>
       <h1 class="name">Baird Wang</h1>
@@ -464,11 +484,12 @@
       </p>
     </section>
   </div>
+  </div>
 
-  <dialog id="detail">
+  <div id="detail" class="project-view" hidden>
     <div class="detail-inner">
       <div class="detail-top">
-        <h2 class="detail-title" id="detail-title"></h2>
+        <h1 class="detail-title" id="detail-title"></h1>
       </div>
       <div id="detail-body"></div>
       <div class="detail-footer">
@@ -476,7 +497,7 @@
         <button type="button" id="detail-back-top">Back to Top</button>
       </div>
     </div>
-  </dialog>
+  </div>
 
   <script>
     (function () {
@@ -607,7 +628,8 @@
         }
       };
 
-      var dialogEl = document.getElementById("detail");
+      var pageRoot = document.getElementById("page-root");
+      var detailEl = document.getElementById("detail");
       var titleEl = document.getElementById("detail-title");
       var bodyEl = document.getElementById("detail-body");
       var closeBottomBtn = document.getElementById("detail-close-bottom");
@@ -641,40 +663,39 @@
             '" alt="" loading="lazy" /></figure>';
         }
         bodyEl.innerHTML = html;
-        dialogEl.scrollTop = 0;
       }
 
-      function lockPageScroll(lock) {
-        var v = lock ? "hidden" : "";
-        document.documentElement.style.overflow = v;
-        document.body.style.overflow = v;
+      function openProjectView() {
+        pageRoot.hidden = true;
+        detailEl.hidden = false;
+        window.scrollTo(0, 0);
       }
 
-      dialogEl.addEventListener("close", function () {
-        lockPageScroll(false);
-      });
+      function closeProjectView() {
+        detailEl.hidden = true;
+        pageRoot.hidden = false;
+        window.scrollTo(0, 0);
+      }
 
       document.querySelectorAll(".work-trigger").forEach(function (btn) {
         btn.addEventListener("click", function () {
           var id = btn.getAttribute("data-project");
           renderProject(id);
-          lockPageScroll(true);
-          dialogEl.showModal();
-          dialogEl.scrollTop = 0;
+          openProjectView();
         });
       });
 
       closeBottomBtn.addEventListener("click", function () {
-        dialogEl.close();
+        closeProjectView();
       });
 
       backTopBtn.addEventListener("click", function () {
-        dialogEl.scrollTo({ top: 0, behavior: "smooth" });
+        window.scrollTo({ top: 0, behavior: "smooth" });
       });
 
-      dialogEl.addEventListener("click", function (e) {
-        if (e.target === dialogEl) {
-          dialogEl.close();
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape" && !detailEl.hidden) {
+          closeProjectView();
         }
       });
     })();
