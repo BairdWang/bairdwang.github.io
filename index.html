@@ -1002,20 +1002,29 @@
         document.head.appendChild(scr);
       }
 
-      function squidVimeoEmbedSrc(vimeoId, showControls) {
+      function vimeoStartTimeHash(seconds) {
+        if (typeof seconds !== "number" || isNaN(seconds) || seconds < 0.05) {
+          return "";
+        }
+        return "#t=" + seconds + "s";
+      }
+
+      function squidVimeoEmbedSrc(vimeoId, showControls, startSeconds) {
         var base =
           "https://player.vimeo.com/video/" +
           vimeoId +
           "?title=0&byline=0&portrait=0&badge=0&vimeo_logo=0" +
           "&muted=1&autopause=1&playsinline=1&dnt=1";
+        var qs;
         if (showControls) {
-          return (
-            base +
+          qs =
             "&controls=1&progress_bar=1&keyboard=1&fullscreen=1&volume=1" +
-            "&pip=0&chromecast=0&cc=0&chapters=0&quality_selector=0&transcript=0"
-          );
+            "&pip=0&chromecast=0&cc=0&chapters=0&quality_selector=0&transcript=0" +
+            "&speed=0&audio_track=0";
+        } else {
+          qs = "&controls=0&progress_bar=0";
         }
-        return base + "&controls=0&progress_bar=0";
+        return base + qs + vimeoStartTimeHash(startSeconds);
       }
 
       function squidSwapControls(wrap, showControls) {
@@ -1039,7 +1048,7 @@
             });
           })
           .then(function (state) {
-            iframe.src = squidVimeoEmbedSrc(id, showControls);
+            iframe.src = squidVimeoEmbedSrc(id, showControls, state.t);
             wrap.setAttribute("data-squid-controls", want);
             return new Promise(function (resolve, reject) {
               function done() {
@@ -1059,11 +1068,18 @@
           .then(function (state) {
             var np = new Vimeo.Player(iframe);
             wrap._squidPlayer = np;
-            return np.setCurrentTime(state.t).then(function () {
-              return np.setMuted(true);
-            }).then(function () {
-              if (!state.paused) return np.play();
-            });
+            var t = typeof state.t === "number" && !isNaN(state.t) ? state.t : 0;
+            return np
+              .ready()
+              .then(function () {
+                return np.setCurrentTime(t);
+              })
+              .then(function () {
+                return np.setMuted(true);
+              })
+              .then(function () {
+                if (!state.paused) return np.play();
+              });
           })
           .catch(function () {})
           .finally(function () {
