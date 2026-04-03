@@ -177,6 +177,45 @@
       border-bottom: 1px solid var(--border);
       font-size: 13px;
     }
+    .guide-content {
+      font-size: 0.94rem;
+      line-height: 1.65;
+      color: var(--text);
+      max-width: 48rem;
+    }
+    .guide-content h2 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin: 1.35rem 0 0.5rem;
+      color: var(--text);
+    }
+    .guide-content h2:first-child { margin-top: 0; }
+    .guide-content ol { margin: 0.35rem 0 0.85rem; padding-left: 1.35rem; }
+    .guide-content ul { margin: 0.35rem 0 0.85rem; padding-left: 1.25rem; }
+    .guide-content li { margin: 0.35rem 0; }
+    .guide-content code {
+      font-family: ui-monospace, "Cascadia Code", monospace;
+      font-size: 0.88em;
+      background: rgba(0, 0, 0, 0.35);
+      padding: 0.12em 0.4em;
+      border-radius: 4px;
+    }
+    .guide-content pre {
+      margin: 0.5rem 0 1rem;
+      padding: 0.85rem 1rem;
+      background: #1a1a1a;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow-x: auto;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+    .guide-content pre code {
+      background: none;
+      padding: 0;
+      font-size: inherit;
+    }
+    .guide-content .note { color: var(--muted); font-size: 0.92rem; margin-top: 0.5rem; }
   </style>
 </head>
 <body>
@@ -193,6 +232,7 @@
     <button type="button" data-tab="home" role="tab">首页作品</button>
     <button type="button" data-tab="contact" role="tab">首页与联系</button>
     <button type="button" data-tab="project" role="tab">项目详情</button>
+    <button type="button" data-tab="guide" role="tab">操作说明</button>
     <button type="button" data-tab="json" role="tab">原始 JSON</button>
   </nav>
 
@@ -256,6 +296,37 @@
         <button type="button" id="btn-add-vimeo-block">＋ Vimeo 块</button>
       </div>
       <div id="block-list"></div>
+    </div>
+  </section>
+
+  <section id="panel-guide" class="tab-panel" role="tabpanel">
+    <div class="panel guide-content">
+      <h2>新增项目：推荐流程</h2>
+      <ol>
+        <li><strong>准备图片</strong>：在仓库本地目录放入图片，例如 <code>assets/img/你的项目名/</code> 或 <code>assets/img/</code>。文件名建议英文、无空格。</li>
+        <li><strong>打开本管理页</strong>：部署后使用 <code>https://你的域名/admin.html</code>；本地开发请用本地服务器打开（勿用 <code>file://</code>），否则图片预览可能不准。</li>
+        <li><strong>加载数据</strong>：在「文件」中点击「从站点加载 <code>site-data.json</code>」。</li>
+        <li><strong>写入项目数据</strong>：
+          <ul>
+            <li>在「原始 JSON」中，于 <code>projects</code> 下增加新键（项目 ID，如 <code>my-new-game</code>），可复制现有项目再改；至少包含 <code>title</code>，按需填写 <code>images</code>、<code>videos</code>、<code>videosAfterImages</code> 等。</li>
+            <li>若需图文与 Vimeo 穿插，使用 <code>blocks</code> 与 <code>vimeoEmbedOptions</code>（可参考 <code>squid-game-unleashed</code>）。</li>
+          </ul>
+        </li>
+        <li><strong>首页入口</strong>：在「首页作品」增加一条：项目 ID（与 <code>projects</code> 的键一致）、标题、缩略图路径、alt。</li>
+        <li><strong>检查</strong>：在「项目详情」中选中新项目，核对标题、备注、图片列表、YouTube、内容块。</li>
+        <li><strong>导出</strong>：「文件」→「下载 <code>site-data.json</code>」，用其<strong>覆盖</strong>仓库根目录的 <code>site-data.json</code>。</li>
+      </ol>
+      <h2>提交到 GitHub</h2>
+      <p>在仓库根目录执行：</p>
+      <pre><code>git add site-data.json assets/img/
+git commit -m "Add project: my-new-game"
+git push</code></pre>
+      <p class="note">等待 GitHub Pages 更新后，首页会出现新卡片，点击进入即可查看新项目。</p>
+      <h2>注意</h2>
+      <ul>
+        <li>静态站<strong>没有服务器上传</strong>：图片必须进 Git 仓库后再推送；此处只填<strong>相对路径</strong>（如 <code>assets/img/foo.png</code>）。</li>
+        <li>项目 ID 在站内须<strong>唯一</strong>，且「首页作品」里的 ID 与 <code>projects</code> 中的键<strong>必须一致</strong>。</li>
+      </ul>
     </div>
   </section>
 
