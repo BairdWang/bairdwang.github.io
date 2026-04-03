@@ -6,7 +6,7 @@
   <title>Baird Wang — Portfolio</title>
   <style>
     :root {
-      --bg: #000000;
+      --bg: #141414;
       --text: #f2ece4;
       --text-muted: rgba(242, 236, 228, 0.55);
       --contact-muted: #888888;
@@ -147,9 +147,14 @@
       max-width: 36rem;
     }
 
+    .contact-head {
+      display: inline-block;
+      margin-bottom: 0;
+    }
+
     .contact-title {
       margin: 0;
-      font-size: 0.75rem;
+      font-size: 1.125rem;
       font-weight: 500;
       letter-spacing: 0.28em;
       text-transform: uppercase;
@@ -158,9 +163,9 @@
 
     .contact-rule {
       display: block;
-      width: 5.5rem;
+      width: 100%;
       height: 1px;
-      margin: 1rem 0 1.5rem;
+      margin: 0.35rem 0 1.25rem;
       background: var(--contact-muted);
       opacity: 0.85;
     }
@@ -172,6 +177,13 @@
       color: var(--contact-muted);
     }
 
+    .contact-email-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.65rem;
+    }
+
     .contact-email {
       margin: 0;
       font-size: clamp(1.25rem, 3vw, 1.65rem);
@@ -180,15 +192,90 @@
       color: #ffffff;
     }
 
-    .contact-email a {
-      color: inherit;
-      text-decoration: none;
+    .contact-copy-wrap {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      vertical-align: middle;
     }
 
-    .contact-email a:hover,
-    .contact-email a:focus-visible {
-      text-decoration: underline;
-      text-underline-offset: 0.2em;
+    .contact-copy {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.25rem;
+      margin: 0;
+      border: none;
+      background: none;
+      color: #ffffff;
+      cursor: pointer;
+      border-radius: 4px;
+      line-height: 0;
+    }
+
+    .contact-copy:hover,
+    .contact-copy:focus-visible {
+      color: #f2ece4;
+      background: rgba(255, 255, 255, 0.06);
+      outline: none;
+    }
+
+    .contact-copy svg {
+      display: block;
+    }
+
+    .contact-tooltip-hover {
+      position: absolute;
+      left: 50%;
+      bottom: calc(100% + 6px);
+      transform: translateX(-50%);
+      padding: 4px 8px;
+      font-size: 0.75rem;
+      font-weight: 400;
+      letter-spacing: 0.02em;
+      text-transform: none;
+      color: #f2ece4;
+      background: #2a2a2a;
+      border-radius: 4px;
+      white-space: nowrap;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.15s ease;
+      z-index: 2;
+    }
+
+    .contact-copy-wrap:hover .contact-tooltip-hover,
+    .contact-copy-wrap:focus-within .contact-tooltip-hover {
+      opacity: 1;
+    }
+
+    .contact-copy-wrap.is-copied .contact-tooltip-hover {
+      opacity: 0;
+    }
+
+    .contact-copy-toast {
+      position: absolute;
+      left: 50%;
+      bottom: calc(100% + 6px);
+      transform: translateX(-50%);
+      padding: 4px 8px;
+      font-size: 0.75rem;
+      color: #f2ece4;
+      background: #2a2a2a;
+      border-radius: 4px;
+      white-space: nowrap;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      z-index: 3;
+    }
+
+    .contact-copy-toast.is-visible {
+      opacity: 1;
+    }
+
+    .contact-copy-toast.is-hiding {
+      opacity: 0;
     }
 
     /*
@@ -262,14 +349,14 @@
       display: flex;
       flex-wrap: wrap;
       gap: 1.25rem 2.5rem;
-      justify-content: flex-start;
+      justify-content: center;
       align-items: center;
       margin-top: clamp(2rem, 5vw, 3rem);
       padding: 1.75rem 0 0;
       border-top: 1px solid #2a2a2a;
     }
 
-    .detail-footer button {
+    .detail-footer-btn {
       margin: 0;
       padding: 0;
       border: none;
@@ -281,11 +368,19 @@
       text-transform: uppercase;
       cursor: pointer;
       text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
     }
 
-    .detail-footer button:hover,
-    .detail-footer button:focus-visible {
+    .detail-footer-btn:hover,
+    .detail-footer-btn:focus-visible {
       color: var(--text);
+    }
+
+    .detail-footer-icon {
+      flex-shrink: 0;
+      display: block;
     }
 
     .detail-note {
@@ -524,14 +619,26 @@
     </ul>
 
     <section class="contact" id="contact" aria-labelledby="contact-heading">
-      <h2 class="contact-title" id="contact-heading">CONTACT</h2>
-      <span class="contact-rule" aria-hidden="true"></span>
+      <div class="contact-head">
+        <h2 class="contact-title" id="contact-heading">CONTACT</h2>
+        <span class="contact-rule" aria-hidden="true"></span>
+      </div>
       <p class="contact-lede">
         Have an interesting project in mind, or just want to say hello? Feel free to reach out.
       </p>
-      <p class="contact-email">
-        <a href="mailto:younger4005@gmail.com">younger4005@gmail.com</a>
-      </p>
+      <div class="contact-email-row">
+        <span class="contact-email" id="contact-email-text">younger4005@gmail.com</span>
+        <span class="contact-copy-wrap">
+          <button type="button" class="contact-copy" id="contact-copy-btn" aria-label="Copy email to clipboard">
+            <svg class="contact-copy-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+            </svg>
+          </button>
+          <span class="contact-tooltip-hover" aria-hidden="true">Copy</span>
+          <span class="contact-copy-toast" id="contact-copy-toast" role="status" aria-live="polite"></span>
+        </span>
+      </div>
     </section>
   </div>
   </div>
@@ -544,8 +651,18 @@
       </div>
       <div id="detail-body"></div>
       <div class="detail-footer">
-        <button type="button" id="detail-close-bottom">Close</button>
-        <button type="button" id="detail-back-top">Back to Top</button>
+        <button type="button" class="detail-footer-btn" id="detail-close-bottom">
+          <svg class="detail-footer-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true">
+            <path d="M18 6L6 18M6 6l12 12" />
+          </svg>
+          Close
+        </button>
+        <button type="button" class="detail-footer-btn" id="detail-back-top">
+          <svg class="detail-footer-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 19V5M5 12l7-7 7 7" />
+          </svg>
+          Back to Top
+        </button>
       </div>
     </div>
   </div>
@@ -756,6 +873,61 @@
           closeProjectView();
         }
       });
+
+      var copyBtn = document.getElementById("contact-copy-btn");
+      var emailTextEl = document.getElementById("contact-email-text");
+      var copyToast = document.getElementById("contact-copy-toast");
+      var copyWrap = copyBtn ? copyBtn.closest(".contact-copy-wrap") : null;
+      var copyShowTimeout;
+      var copyHideTimeout;
+
+      function fallbackCopyText(text) {
+        var ta = document.createElement("textarea");
+        ta.value = text;
+        ta.setAttribute("readonly", "");
+        ta.style.position = "fixed";
+        ta.style.left = "-9999px";
+        document.body.appendChild(ta);
+        ta.select();
+        try {
+          document.execCommand("copy");
+        } catch (err) {}
+        document.body.removeChild(ta);
+      }
+
+      if (copyBtn && emailTextEl && copyToast && copyWrap) {
+        copyBtn.addEventListener("click", function () {
+          var email = emailTextEl.textContent.trim();
+
+          function showCopiedToast() {
+            window.clearTimeout(copyShowTimeout);
+            window.clearTimeout(copyHideTimeout);
+            copyToast.textContent = "Copied";
+            copyToast.classList.remove("is-hiding");
+            copyToast.classList.add("is-visible");
+            copyWrap.classList.add("is-copied");
+            copyShowTimeout = window.setTimeout(function () {
+              copyToast.classList.add("is-hiding");
+              copyToast.classList.remove("is-visible");
+              copyHideTimeout = window.setTimeout(function () {
+                copyToast.textContent = "";
+                copyToast.classList.remove("is-hiding");
+                copyWrap.classList.remove("is-copied");
+              }, 450);
+            }, 2000);
+          }
+
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(email).then(showCopiedToast).catch(function () {
+              fallbackCopyText(email);
+              showCopiedToast();
+            });
+          } else {
+            fallbackCopyText(email);
+            showCopiedToast();
+          }
+        });
+      }
     })();
   </script>
 </body>
