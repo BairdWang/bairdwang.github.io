@@ -135,7 +135,7 @@
     /* Adobe .project-cover .title + .details-wrap */
     .caption {
       margin: 0 auto;
-      padding-top: 4.5%;
+      padding-top: max(0px, calc(4.5% - 10px));
       padding-bottom: 0;
       font-family: arial, sans-serif;
       font-size: 24px;
@@ -175,7 +175,7 @@
       display: block;
       width: 100%;
       height: 1px;
-      margin: 0.35rem 0 1.25rem;
+      margin: 0.175rem 0 1.25rem;
       background: var(--contact-muted);
       opacity: 0.85;
     }
@@ -349,6 +349,7 @@
       margin: 0;
       max-width: min(100vw - 8rem, 40rem);
       transform: none;
+      font-size: calc(clamp(3.375rem, 7.5vw, 4.05rem) * 0.85 * 2 / 3);
     }
 
     .detail-back-header:hover,
@@ -739,6 +740,7 @@
         },
         "marvel-world-of-heroes": {
           title: "Marvel World Of Heroes",
+          videosAfterImages: true,
           videos: ["ewXXN0S81_Q"],
           images: [
             "https://cdn.myportfolio.com/197a6bd9-dcd9-42d3-8e20-5e24d83ae321/cfd9c5c9-498f-471a-a5aa-f2fbc050a0c2_rw_1200.png?h=9b56b12134ddf62305805b2a6e474fbb",
@@ -752,6 +754,7 @@
         },
         "magic-spellslingers": {
           title: "Magic Spellslingers",
+          videosAfterImages: true,
           videos: ["SDhmRwPpd_c"],
           images: [
             "https://cdn.myportfolio.com/197a6bd9-dcd9-42d3-8e20-5e24d83ae321/6b2ccecf-abe0-48b3-8f80-c396095598c1_rw_1200.png?h=9a0e1a0551a4ddf1f3945f56d2056da5",
@@ -835,6 +838,51 @@
       var backTopBtn = document.getElementById("detail-back-top");
       var backHeaderBtn = document.getElementById("detail-back-header");
 
+      function appendYoutubeVideos(html, videos) {
+        for (var v = 0; v < videos.length; v++) {
+          html +=
+            '<div class="detail-video"><iframe src="https://www.youtube.com/embed/' +
+            videos[v] +
+            '" title="Embedded video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe></div>';
+        }
+        return html;
+      }
+
+      function appendVimeoVideo(html, vimeoId) {
+        return (
+          html +
+          '<div class="detail-video"><iframe src="https://player.vimeo.com/video/' +
+          vimeoId +
+          '?title=0&amp;byline=0&amp;portrait=0" title="Embedded video" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen loading="lazy"></iframe></div>'
+        );
+      }
+
+      function appendFigures(html, images, start, count) {
+        var end = start + count;
+        for (var i = start; i < end && i < images.length; i++) {
+          html +=
+            '<figure class="detail-figure"><img src="' +
+            images[i] +
+            '" alt="" loading="lazy" /></figure>';
+        }
+        return html;
+      }
+
+      function renderSquidGameUnleashedBody(p) {
+        var imgs = p.images;
+        var vimeoIds = ["1134762428", "1134763710", "1134763692", "1134763717"];
+        var imageCountsBeforeVideo = [1, 4, 3, 10];
+        var html = "";
+        var idx = 0;
+        for (var s = 0; s < vimeoIds.length; s++) {
+          html = appendFigures(html, imgs, idx, imageCountsBeforeVideo[s]);
+          idx += imageCountsBeforeVideo[s];
+          html = appendVimeoVideo(html, vimeoIds[s]);
+        }
+        html = appendFigures(html, imgs, idx, imgs.length - idx);
+        return html;
+      }
+
       function renderProject(id) {
         var p = PROJECTS[id];
         if (!p) return;
@@ -850,18 +898,24 @@
               .replace(/>/g, "&gt;") +
             "</p>";
         }
-        for (var v = 0; v < p.videos.length; v++) {
-          var vid = p.videos[v];
-          html +=
-            '<div class="detail-video"><iframe src="https://www.youtube.com/embed/' +
-            vid +
-            '" title="Embedded video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe></div>';
-        }
-        for (var i = 0; i < p.images.length; i++) {
-          html +=
-            '<figure class="detail-figure"><img src="' +
-            p.images[i] +
-            '" alt="" loading="lazy" /></figure>';
+        if (id === "squid-game-unleashed") {
+          html += renderSquidGameUnleashedBody(p);
+        } else {
+          var vids = p.videos || [];
+          var imgs = p.images || [];
+          var videosFirst = !p.videosAfterImages;
+          if (videosFirst) {
+            html = appendYoutubeVideos(html, vids);
+          }
+          for (var i = 0; i < imgs.length; i++) {
+            html +=
+              '<figure class="detail-figure"><img src="' +
+              imgs[i] +
+              '" alt="" loading="lazy" /></figure>';
+          }
+          if (!videosFirst) {
+            html = appendYoutubeVideos(html, vids);
+          }
         }
         bodyEl.innerHTML = html;
       }
