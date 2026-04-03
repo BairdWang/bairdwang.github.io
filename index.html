@@ -17,6 +17,8 @@
       --detail-img-w: 1890px;
       /* Homepage "Baird Wang" font / thumb-column width */
       --name-thumb-ratio: 0.146;
+      /* Project caption vs displayed thumb width (~24px / ~378px at 3-col desktop) */
+      --caption-thumb-ratio: 0.06349;
     }
 
     *,
@@ -80,8 +82,12 @@
       font-size: calc(clamp(3.375rem, 7.5vw, 4.05rem) * 0.85);
     }
 
-    /* No cqi: at narrowest, title half of vw-based size */
+    /* Narrowest: double space above "Baird Wang"; caption ratio uses @supports block below */
     @media (max-width: 540px) {
+      #page-root .page {
+        padding-top: calc(clamp(0.625rem, 2vw, 1.25rem) * 2);
+      }
+
       #page-root .page > header .name {
         font-size: calc(clamp(3.375rem, 7.5vw, 4.05rem) * 0.85 * 0.5);
       }
@@ -133,6 +139,8 @@
       width: 29%;
       margin-right: 6.5%;
       margin-bottom: 0;
+      container-type: inline-size;
+      container-name: work-card;
     }
 
     .work:nth-child(3n) {
@@ -183,20 +191,26 @@
       transform: scale(1.02);
     }
 
-    /* Adobe .project-cover .title + .details-wrap */
+    /* Adobe .project-cover .title + .details-wrap; size tracks thumb via .work container */
     .caption {
       margin: 0 auto;
       padding-top: max(0px, calc(4.5% - 10px));
-      padding-bottom: 0;
+      padding-bottom: 0.33em;
       font-family: arial, sans-serif;
-      font-size: 24px;
+      font-size: clamp(14px, 3.8vw, 24px);
       font-weight: 300;
-      line-height: 28px;
+      line-height: 1.167;
       color: #eeeeee;
       letter-spacing: 0;
       text-align: center;
       text-transform: none;
       width: 90%;
+    }
+
+    @supports (font-size: 1cqi) {
+      .caption {
+        font-size: max(0.8125rem, calc(min(100cqi, var(--thumb-max-w)) * var(--caption-thumb-ratio)));
+      }
     }
 
     .work .work-trigger {
@@ -588,12 +602,6 @@
         padding-top: calc(20px * 2 / 3 / 2);
       }
 
-      .caption {
-        font-size: 18px;
-        line-height: 21px;
-        padding-bottom: 8px;
-      }
-
       .work {
         width: 46.75%;
       }
@@ -621,11 +629,6 @@
         width: 100%;
       }
 
-      .caption {
-        font-size: 15px;
-        line-height: 18px;
-        padding-bottom: 7px;
-      }
     }
   </style>
 </head>
