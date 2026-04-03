@@ -529,27 +529,6 @@
       border: 0;
     }
 
-    /* Squid Game Vimeo: cover bottom control bar; show on hover (devices with fine pointer) */
-    @media (hover: hover) and (pointer: fine) {
-      .detail-video--squid-vimeo::after {
-        content: "";
-        position: absolute;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        height: 52px;
-        background: var(--bg);
-        z-index: 2;
-        pointer-events: none;
-        transition: opacity 0.15s ease, height 0.15s ease;
-      }
-
-      .detail-video--squid-vimeo:hover::after {
-        opacity: 0;
-        height: 0;
-      }
-    }
-
     .detail-figure {
       margin: 0;
       display: block;
@@ -1081,7 +1060,7 @@
           html +
           '<div class="detail-video detail-video--squid-vimeo"><iframe src="https://player.vimeo.com/video/' +
           vimeoId +
-          '?title=0&amp;byline=0&amp;portrait=0&amp;controls=1&amp;muted=1&amp;autopause=1&amp;playsinline=1&amp;dnt=1" title="Embedded video" allow="autoplay; fullscreen; picture-in-picture; encrypted-media" allowfullscreen loading="lazy"></iframe></div>'
+          '?title=0&amp;byline=0&amp;portrait=0&amp;controls=0&amp;muted=1&amp;autopause=1&amp;playsinline=1&amp;dnt=1&amp;badge=0&amp;vimeo_logo=0&amp;progress_bar=0" title="Embedded video" allow="autoplay; fullscreen; picture-in-picture; encrypted-media" allowfullscreen loading="lazy"></iframe></div>'
         );
       }
 
