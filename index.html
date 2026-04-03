@@ -529,6 +529,27 @@
       border: 0;
     }
 
+    /* Squid Game Vimeo: cover bottom control bar; show on hover (devices with fine pointer) */
+    @media (hover: hover) and (pointer: fine) {
+      .detail-video--squid-vimeo::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 52px;
+        background: var(--bg);
+        z-index: 2;
+        pointer-events: none;
+        transition: opacity 0.15s ease, height 0.15s ease;
+      }
+
+      .detail-video--squid-vimeo:hover::after {
+        opacity: 0;
+        height: 0;
+      }
+    }
+
     .detail-figure {
       margin: 0;
       display: block;
@@ -967,6 +988,83 @@
       var closeBottomBtn = document.getElementById("detail-close-bottom");
       var backTopBtn = document.getElementById("detail-back-top");
       var backHeaderBtn = document.getElementById("detail-back-header");
+      var galleryScrollY = 0;
+      var squidVimeoCleanups = [];
+      var vimeoApiCallbacks = [];
+
+      function teardownSquidVimeo() {
+        while (squidVimeoCleanups.length) {
+          var fn = squidVimeoCleanups.pop();
+          try {
+            fn();
+          } catch (err) {}
+        }
+      }
+
+      function ensureVimeoPlayerScript(cb) {
+        if (typeof Vimeo !== "undefined" && Vimeo.Player) {
+          cb();
+          return;
+        }
+        vimeoApiCallbacks.push(cb);
+        if (document.querySelector("script[data-vimeo-player-api]")) return;
+        var scr = document.createElement("script");
+        scr.src = "https://player.vimeo.com/api/player.js";
+        scr.async = true;
+        scr.dataset.vimeoPlayerApi = "1";
+        scr.onload = function () {
+          var queue = vimeoApiCallbacks.splice(0);
+          for (var q = 0; q < queue.length; q++) {
+            try {
+              queue[q]();
+            } catch (err) {}
+          }
+        };
+        document.head.appendChild(scr);
+      }
+
+      function initSquidVimeoPlayers() {
+        teardownSquidVimeo();
+        var wraps = bodyEl.querySelectorAll(".detail-video--squid-vimeo");
+        if (!wraps.length) return;
+        ensureVimeoPlayerScript(function () {
+          if (detailEl.hidden) return;
+          var list = bodyEl.querySelectorAll(".detail-video--squid-vimeo");
+          for (var w = 0; w < list.length; w++) {
+            (function (wrap) {
+              if (!wrap.isConnected) return;
+              var iframe = wrap.querySelector("iframe");
+              if (!iframe) return;
+              var player = new Vimeo.Player(iframe);
+              var io = new IntersectionObserver(
+                function (entries) {
+                  entries.forEach(function (en) {
+                    var vis = en.isIntersecting && en.intersectionRatio >= 0.32;
+                    if (vis) {
+                      player.setMuted(true).then(function () {
+                        return player.play();
+                      }).catch(function () {});
+                    } else {
+                      player.pause().catch(function () {});
+                    }
+                  });
+                },
+                { threshold: [0, 0.15, 0.32, 0.5, 0.75] }
+              );
+              io.observe(wrap);
+              squidVimeoCleanups.push(function () {
+                io.disconnect();
+              });
+              squidVimeoCleanups.push(function () {
+                player.pause().catch(function () {});
+                if (typeof player.destroy === "function") {
+                  player.destroy().catch(function () {});
+                }
+              });
+            })(list[w]);
+          }
+        });
+      }
 
       function appendYoutubeVideos(html, videos) {
         for (var v = 0; v < videos.length; v++) {
@@ -978,12 +1076,12 @@
         return html;
       }
 
-      function appendVimeoVideo(html, vimeoId) {
+      function appendSquidVimeoVideo(html, vimeoId) {
         return (
           html +
-          '<div class="detail-video"><iframe src="https://player.vimeo.com/video/' +
+          '<div class="detail-video detail-video--squid-vimeo"><iframe src="https://player.vimeo.com/video/' +
           vimeoId +
-          '?title=0&amp;byline=0&amp;portrait=0" title="Embedded video" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen loading="lazy"></iframe></div>'
+          '?title=0&amp;byline=0&amp;portrait=0&amp;controls=1&amp;muted=1&amp;autopause=1&amp;playsinline=1&amp;dnt=1" title="Embedded video" allow="autoplay; fullscreen; picture-in-picture; encrypted-media" allowfullscreen loading="lazy"></iframe></div>'
         );
       }
 
@@ -1007,7 +1105,7 @@
         for (var s = 0; s < vimeoIds.length; s++) {
           html = appendFigures(html, imgs, idx, imageCountsBeforeVideo[s]);
           idx += imageCountsBeforeVideo[s];
-          html = appendVimeoVideo(html, vimeoIds[s]);
+          html = appendSquidVimeoVideo(html, vimeoIds[s]);
         }
         html = appendFigures(html, imgs, idx, imgs.length - idx);
         return html;
@@ -1105,18 +1203,24 @@
       }
 
       function openProjectView() {
+        galleryScrollY = window.scrollY || document.documentElement.scrollTop || 0;
         pageRoot.hidden = true;
         detailEl.hidden = false;
         window.scrollTo(0, 0);
       }
 
       function closeProjectView() {
+        teardownSquidVimeo();
         bodyEl.innerHTML = "";
         detailEl.hidden = true;
         pageRoot.hidden = false;
         titleEl.textContent = "";
         document.title = "Baird Wang — Portfolio";
-        window.scrollTo(0, 0);
+        requestAnimationFrame(function () {
+          requestAnimationFrame(function () {
+            window.scrollTo(0, galleryScrollY);
+          });
+        });
       }
 
       backHeaderBtn.addEventListener("click", function () {
@@ -1131,6 +1235,7 @@
           requestAnimationFrame(function () {
             syncDetailVideoWidths();
             bindDetailImgLoadsForVideoSync();
+            initSquidVimeoPlayers();
             requestAnimationFrame(syncDetailVideoWidths);
           });
         });
