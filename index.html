@@ -968,192 +968,100 @@
       var backTopBtn = document.getElementById("detail-back-top");
       var backHeaderBtn = document.getElementById("detail-back-header");
       var galleryScrollY = 0;
-      var squidVimeoCleanups = [];
-      var vimeoApiCallbacks = [];
+      var siteProjectOverrides = {};
 
-      function teardownSquidVimeo() {
-        while (squidVimeoCleanups.length) {
-          var fn = squidVimeoCleanups.pop();
-          try {
-            fn();
-          } catch (err) {}
-        }
-      }
-
-      function ensureVimeoPlayerScript(cb) {
-        if (typeof Vimeo !== "undefined" && Vimeo.Player) {
-          cb();
-          return;
-        }
-        vimeoApiCallbacks.push(cb);
-        if (document.querySelector("script[data-vimeo-player-api]")) return;
-        var scr = document.createElement("script");
-        scr.src = "https://player.vimeo.com/api/player.js";
-        scr.async = true;
-        scr.dataset.vimeoPlayerApi = "1";
-        scr.onload = function () {
-          var queue = vimeoApiCallbacks.splice(0);
-          for (var q = 0; q < queue.length; q++) {
-            try {
-              queue[q]();
-            } catch (err) {}
+      fetch("projects.json")
+        .then(function (r) {
+          return r.ok ? r.json() : {};
+        })
+        .then(function (data) {
+          if (data && typeof data === "object") {
+            siteProjectOverrides = data;
           }
-        };
-        document.head.appendChild(scr);
-      }
+        })
+        .catch(function () {});
 
-      function vimeoStartTimeHash(seconds) {
-        if (typeof seconds !== "number" || isNaN(seconds) || seconds < 0.05) {
-          return "";
+      function getProject(id) {
+        var base = PROJECTS[id];
+        if (!base) return null;
+        var o = {};
+        for (var k in base) {
+          if (Object.prototype.hasOwnProperty.call(base, k)) {
+            o[k] = base[k];
+          }
         }
-        return "#t=" + seconds + "s";
+        var ext = siteProjectOverrides && siteProjectOverrides[id];
+        if (ext && typeof ext === "object") {
+          for (var k2 in ext) {
+            if (Object.prototype.hasOwnProperty.call(ext, k2)) {
+              o[k2] = ext[k2];
+            }
+          }
+        }
+        return o;
       }
 
-      function squidVimeoEmbedSrc(vimeoId, showControls, startSeconds) {
-        var base =
+      function bool01(v, d) {
+        var z = v !== undefined ? v : d;
+        return z ? "1" : "0";
+      }
+
+      function portfolioVimeoEmbedSrc(vimeoId, opts) {
+        opts = opts || {};
+        return (
           "https://player.vimeo.com/video/" +
           vimeoId +
-          "?title=0&byline=0&portrait=0&badge=0&vimeo_logo=0" +
-          "&muted=1&autopause=1&playsinline=1&dnt=1";
-        var qs;
-        if (showControls) {
-          qs =
-            "&controls=1&progress_bar=1&keyboard=1&fullscreen=1&volume=1" +
-            "&pip=0&chromecast=0&cc=0&chapters=0&quality_selector=0&transcript=0" +
-            "&speed=0&audio_track=0";
-        } else {
-          qs = "&controls=0&progress_bar=0";
-        }
-        return base + qs + vimeoStartTimeHash(startSeconds);
+          "?autoplay=" +
+          bool01(opts.autoplay, true) +
+          "&muted=" +
+          bool01(opts.muted, true) +
+          "&loop=" +
+          bool01(opts.loop, true) +
+          "&autopause=" +
+          bool01(opts.autopause, false) +
+          "&controls=" +
+          bool01(opts.controls, true) +
+          "&title=" +
+          bool01(opts.title, false) +
+          "&byline=" +
+          bool01(opts.byline, false) +
+          "&portrait=" +
+          bool01(opts.portrait, false) +
+          "&playsinline=" +
+          bool01(opts.playsinline, true)
+        );
       }
 
-      function squidSwapControls(wrap, showControls) {
-        var id = wrap.getAttribute("data-vimeo-id");
-        var iframe = wrap.querySelector("iframe");
-        if (!id || !iframe || wrap._squidSwapBusy) return;
-        var want = showControls ? "1" : "0";
-        if (wrap.getAttribute("data-squid-controls") === want) return;
-        var p = wrap._squidPlayer;
-        if (!p) return;
-        wrap._squidSwapBusy = true;
-        Promise.all([p.getCurrentTime(), p.getPaused()])
-          .then(function (arr) {
-            return { t: arr[0], paused: arr[1] };
-          })
-          .then(function (state) {
-            return p.pause().then(function () {
-              return state;
-            }).catch(function () {
-              return state;
-            });
-          })
-          .then(function (state) {
-            iframe.src = squidVimeoEmbedSrc(id, showControls, state.t);
-            wrap.setAttribute("data-squid-controls", want);
-            return new Promise(function (resolve, reject) {
-              function done() {
-                iframe.removeEventListener("load", done);
-                iframe.removeEventListener("error", err);
-                resolve(state);
-              }
-              function err() {
-                iframe.removeEventListener("load", done);
-                iframe.removeEventListener("error", err);
-                reject(new Error("iframe"));
-              }
-              iframe.addEventListener("load", done);
-              iframe.addEventListener("error", err);
-            });
-          })
-          .then(function (state) {
-            var np = new Vimeo.Player(iframe);
-            wrap._squidPlayer = np;
-            var t = typeof state.t === "number" && !isNaN(state.t) ? state.t : 0;
-            return np
-              .ready()
-              .then(function () {
-                return np.setCurrentTime(t);
-              })
-              .then(function () {
-                return np.setMuted(true);
-              })
-              .then(function () {
-                if (!state.paused) return np.play();
-              });
-          })
-          .catch(function () {})
-          .finally(function () {
-            wrap._squidSwapBusy = false;
-          });
+      function escAttr(s) {
+        return String(s)
+          .replace(/&/g, "&amp;")
+          .replace(/"/g, "&quot;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;");
       }
 
-      function initSquidVimeoPlayers() {
-        teardownSquidVimeo();
-        var wraps = bodyEl.querySelectorAll(".detail-video--squid-vimeo");
-        if (!wraps.length) return;
-        ensureVimeoPlayerScript(function () {
-          if (detailEl.hidden) return;
-          var list = bodyEl.querySelectorAll(".detail-video--squid-vimeo");
-          var canHover =
-            typeof window.matchMedia === "function" &&
-            window.matchMedia("(hover: hover) and (pointer: fine)").matches;
-          for (var w = 0; w < list.length; w++) {
-            (function (wrap) {
-              if (!wrap.isConnected) return;
-              var iframe = wrap.querySelector("iframe");
-              if (!iframe) return;
-              var player = new Vimeo.Player(iframe);
-              wrap._squidPlayer = player;
-              if (!wrap.getAttribute("data-squid-controls")) {
-                wrap.setAttribute("data-squid-controls", "0");
-              }
-              var io = new IntersectionObserver(
-                function (entries) {
-                  entries.forEach(function (en) {
-                    var pl = wrap._squidPlayer;
-                    if (!pl) return;
-                    var vis =
-                      en.isIntersecting && en.intersectionRatio >= 0.25;
-                    if (vis) {
-                      pl.setMuted(true).then(function () {
-                        return pl.play();
-                      }).catch(function () {});
-                    } else {
-                      pl.pause().catch(function () {});
-                    }
-                  });
-                },
-                { threshold: [0, 0.1, 0.25, 0.35, 0.5, 0.75, 1] }
-              );
-              io.observe(wrap);
-              var onEnter = function () {
-                squidSwapControls(wrap, true);
-              };
-              var onLeave = function () {
-                squidSwapControls(wrap, false);
-              };
-              if (canHover) {
-                wrap.addEventListener("mouseenter", onEnter);
-                wrap.addEventListener("mouseleave", onLeave);
-              }
-              squidVimeoCleanups.push(function () {
-                if (canHover) {
-                  wrap.removeEventListener("mouseenter", onEnter);
-                  wrap.removeEventListener("mouseleave", onLeave);
-                }
-                io.disconnect();
-                var pl = wrap._squidPlayer;
-                wrap._squidPlayer = null;
-                if (pl) {
-                  pl.pause().catch(function () {});
-                  if (typeof pl.destroy === "function") {
-                    pl.destroy().catch(function () {});
-                  }
-                }
-              });
-            })(list[w]);
+      function renderBlocksBody(p) {
+        var blocks = p.blocks;
+        if (!blocks || !blocks.length) return "";
+        var vOpts = p.vimeoEmbedOptions || null;
+        var html = "";
+        for (var i = 0; i < blocks.length; i++) {
+          var b = blocks[i];
+          if (!b || !b.type) continue;
+          if (b.type === "image" && b.src) {
+            html +=
+              '<figure class="detail-figure"><img src="' +
+              escAttr(b.src) +
+              '" alt="" loading="lazy" /></figure>';
+          } else if (b.type === "vimeo" && b.id) {
+            var rawSrc = portfolioVimeoEmbedSrc(String(b.id), vOpts);
+            html +=
+              '<div class="detail-video"><iframe src="' +
+              escAttr(rawSrc) +
+              '" title="Embedded video" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen loading="lazy"></iframe></div>';
           }
-        });
+        }
+        return html;
       }
 
       function appendYoutubeVideos(html, videos) {
@@ -1166,15 +1074,13 @@
         return html;
       }
 
-      function appendSquidVimeoVideo(html, vimeoId) {
-        var src = squidVimeoEmbedSrc(vimeoId, false);
+      function appendPortfolioVimeoBlock(html, vimeoId, vimeoOpts) {
+        var raw = portfolioVimeoEmbedSrc(String(vimeoId), vimeoOpts || null);
         return (
           html +
-          '<div class="detail-video detail-video--squid-vimeo" data-vimeo-id="' +
-          vimeoId +
-          '" data-squid-controls="0"><iframe src="' +
-          src.replace(/&/g, "&amp;") +
-          '" title="Embedded video" allow="autoplay; fullscreen; picture-in-picture; encrypted-media" allowfullscreen loading="lazy"></iframe></div>'
+          '<div class="detail-video"><iframe src="' +
+          escAttr(raw) +
+          '" title="Embedded video" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen loading="lazy"></iframe></div>'
         );
       }
 
@@ -1193,12 +1099,13 @@
         var imgs = p.images;
         var vimeoIds = ["1134762428", "1134763710", "1134763692", "1134763717"];
         var imageCountsBeforeVideo = [1, 4, 3, 10];
+        var vimeoOpts = p.vimeoEmbedOptions || null;
         var html = "";
         var idx = 0;
         for (var s = 0; s < vimeoIds.length; s++) {
           html = appendFigures(html, imgs, idx, imageCountsBeforeVideo[s]);
           idx += imageCountsBeforeVideo[s];
-          html = appendSquidVimeoVideo(html, vimeoIds[s]);
+          html = appendPortfolioVimeoBlock(html, vimeoIds[s], vimeoOpts);
         }
         html = appendFigures(html, imgs, idx, imgs.length - idx);
         return html;
@@ -1259,7 +1166,7 @@
       });
 
       function renderProject(id) {
-        var p = PROJECTS[id];
+        var p = getProject(id);
         if (!p) return;
         titleEl.textContent = p.title;
         document.title = p.title + " — Baird Wang";
@@ -1269,11 +1176,13 @@
             '<p class="detail-note">' +
             p.note
               .replace(/&/g, "&amp;")
-              .replace(/</g, "&lt;")
+           .replace(/</g, "&lt;")
               .replace(/>/g, "&gt;") +
             "</p>";
         }
-        if (id === "squid-game-unleashed") {
+        if (p.blocks && p.blocks.length) {
+          html += renderBlocksBody(p);
+        } else if (id === "squid-game-unleashed") {
           html += renderSquidGameUnleashedBody(p);
         } else {
           var vids = p.videos || [];
@@ -1303,7 +1212,6 @@
       }
 
       function closeProjectView() {
-        teardownSquidVimeo();
         bodyEl.innerHTML = "";
         detailEl.hidden = true;
         pageRoot.hidden = false;
@@ -1328,7 +1236,6 @@
           requestAnimationFrame(function () {
             syncDetailVideoWidths();
             bindDetailImgLoadsForVideoSync();
-            initSquidVimeoPlayers();
             requestAnimationFrame(syncDetailVideoWidths);
           });
         });

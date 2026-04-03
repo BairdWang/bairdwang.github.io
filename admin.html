@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>内容管理 — Squid Game Unleashed</title>
+  <style>
+    :root {
+      --bg: #141414;
+      --text: #f2ece4;
+      --muted: rgba(242, 236, 228, 0.55);
+      --accent: #7eb8da;
+      --border: rgba(242, 236, 228, 0.15);
+      --btn: #2a2a2a;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      font-size: 15px;
+      line-height: 1.5;
+      padding: clamp(1rem, 4vw, 2rem);
+    }
+    h1 { font-weight: 500; font-size: 1.35rem; margin: 0 0 0.5rem; }
+    p.intro { color: var(--muted); margin: 0 0 1.25rem; max-width: 52rem; }
+    a { color: var(--accent); }
+    .row { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; margin-bottom: 1rem; }
+    button, .file-btn {
+      font: inherit;
+      border: 1px solid var(--border);
+      background: var(--btn);
+      color: var(--text);
+      padding: 0.45rem 0.85rem;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    button:hover, .file-btn:hover { border-color: rgba(242,236,228,0.35); }
+    button.danger { border-color: #6b3030; color: #e8a0a0; }
+    input[type="text"], textarea {
+      font: inherit;
+      background: #1e1e1e;
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 6px;
+      padding: 0.4rem 0.6rem;
+      width: 100%;
+      max-width: 100%;
+    }
+    textarea { min-height: 220px; font-family: ui-monospace, monospace; font-size: 13px; }
+    .panel {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1rem 1.1rem;
+      margin-bottom: 1.25rem;
+      max-width: 56rem;
+    }
+    .panel h2 { font-size: 1rem; margin: 0 0 0.75rem; font-weight: 600; }
+    .block-item {
+      display: grid;
+      grid-template-columns: 5rem 1fr auto;
+      gap: 0.5rem;
+      align-items: start;
+      padding: 0.65rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .block-item:last-child { border-bottom: 0; }
+    .block-type { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; padding-top: 0.35rem; }
+    .block-actions { display: flex; flex-direction: column; gap: 0.25rem; }
+    .block-actions button { padding: 0.25rem 0.45rem; font-size: 12px; }
+    .opts {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+      gap: 0.5rem 1rem;
+      margin-top: 0.5rem;
+    }
+    label.chk { display: flex; align-items: center; gap: 0.4rem; font-size: 14px; cursor: pointer; }
+    .status { font-size: 13px; color: var(--muted); margin-top: 0.5rem; min-height: 1.25rem; }
+    .status.err { color: #e8a0a0; }
+    .file-btn { display: inline-block; }
+    .file-btn input { display: none; }
+  </style>
+</head>
+<body>
+  <h1>内容管理 · Squid Game Unleashed</h1>
+  <p class="intro">
+    此页面用于编辑 <code>projects.json</code> 中的<strong>图片顺序与 Vimeo ID</strong>，以及复刻
+    <a href="https://bairdwang.myportfolio.com/squid-game-unleashed" target="_blank" rel="noopener">Adobe Portfolio</a>
+    的 Vimeo 参数。本站不会把文件上传到服务器：图片需使用可访问的 URL（例如 CDN / MyPortfolio）。
+    编辑完成后请<strong>下载 JSON</strong>，覆盖仓库根目录的 <code>projects.json</code> 并推送至 GitHub。
+    <a href="index.html">返回首页</a>
+  </p>
+
+  <div class="panel">
+    <h2>操作</h2>
+    <div class="row">
+      <button type="button" id="btn-reload">从站点重新加载 projects.json</button>
+      <label class="file-btn">
+        导入 JSON
+        <input type="file" id="file-import" accept=".json,application/json" />
+      </label>
+      <button type="button" id="btn-download">下载 projects.json</button>
+      <button type="button" id="btn-preset">写入 Portfolio 默认 Vimeo 参数</button>
+    </div>
+    <div class="status" id="status"></div>
+  </div>
+
+  <div class="panel">
+    <h2>Vimeo 嵌入参数（与 Adobe Portfolio 一致）</h2>
+    <div class="opts" id="vimeo-opts"></div>
+  </div>
+
+  <div class="panel">
+    <h2>内容块顺序（上图 · 下一条可为 Vimeo）</h2>
+    <div class="row">
+      <button type="button" id="btn-add-image">＋ 图片 URL</button>
+      <button type="button" id="btn-add-vimeo">＋ Vimeo 视频 ID</button>
+    </div>
+    <div id="blocks"></div>
+  </div>
+
+  <div class="panel">
+    <h2>原始 JSON（可手动改）</h2>
+    <textarea id="raw-json" spellcheck="false"></textarea>
+    <div class="row" style="margin-top: 0.75rem;">
+      <button type="button" id="btn-apply-raw">从上方文本应用</button>
+    </div>
+  </div>
+
+  <script>
+    var PID = "squid-game-unleashed";
+    var state = {};
+
+    var OPT_DEF = [
+      ["autoplay", "自动播放", true],
+      ["muted", "静音", true],
+      ["loop", "循环", true],
+      ["autopause", "其他视频播放时暂停（Portfolio 为关闭）", false],
+      ["controls", "控制条", true],
+      ["title", "显示标题", false],
+      ["byline", "显示作者行", false],
+      ["portrait", "显示作者头像", false],
+      ["playsinline", "内联播放（移动端）", true]
+    ];
+
+    function setStatus(msg, isErr) {
+      var el = document.getElementById("status");
+      el.textContent = msg || "";
+      el.className = "status" + (isErr ? " err" : "");
+    }
+
+    function defaultVimeoOpts() {
+      var o = {};
+      for (var i = 0; i < OPT_DEF.length; i++) {
+        o[OPT_DEF[i][0]] = OPT_DEF[i][2];
+      }
+      return o;
+    }
+
+    function defaultState() {
+      var base = {};
+      base[PID] = {
+        vimeoEmbedOptions: defaultVimeoOpts(),
+        blocks: []
+      };
+      return base;
+    }
+
+    function deepClone(x) {
+      return JSON.parse(JSON.stringify(x));
+    }
+
+    function ensureShape(data) {
+      if (!data || typeof data !== "object") data = {};
+      if (!data[PID] || typeof data[PID] !== "object") data[PID] = {};
+      if (!data[PID].vimeoEmbedOptions || typeof data[PID].vimeoEmbedOptions !== "object") {
+        data[PID].vimeoEmbedOptions = defaultVimeoOpts();
+      } else {
+        var d = defaultVimeoOpts();
+        for (var k in d) {
+          if (!Object.prototype.hasOwnProperty.call(data[PID].vimeoEmbedOptions, k)) {
+            data[PID].vimeoEmbedOptions[k] = d[k];
+          }
+        }
+      }
+      if (!Array.isArray(data[PID].blocks)) data[PID].blocks = [];
+      return data;
+    }
+
+    function buildVimeoOptInputs() {
+      var host = document.getElementById("vimeo-opts");
+      host.innerHTML = "";
+      var opts = state[PID].vimeoEmbedOptions;
+      for (var i = 0; i < OPT_DEF.length; i++) {
+        var key = OPT_DEF[i][0];
+        var label = OPT_DEF[i][1];
+        var lab = document.createElement("label");
+        lab.className = "chk";
+        var cb = document.createElement("input");
+        cb.type = "checkbox";
+        cb.dataset.key = key;
+        cb.checked = !!opts[key];
+        cb.addEventListener("change", function () {
+          state[PID].vimeoEmbedOptions[this.dataset.key] = this.checked;
+          syncRaw();
+        });
+        lab.appendChild(cb);
+        lab.appendChild(document.createTextNode(label));
+        host.appendChild(lab);
+      }
+    }
+
+    function renderBlocks() {
+      var host = document.getElementById("blocks");
+      host.innerHTML = "";
+      var blocks = state[PID].blocks;
+      for (var i = 0; i < blocks.length; i++) {
+        (function (idx) {
+          var b = blocks[idx];
+          var row = document.createElement("div");
+          row.className = "block-item";
+          var typeEl = document.createElement("div");
+          typeEl.className = "block-type";
+          typeEl.textContent = b.type === "vimeo" ? "Vimeo" : "图片";
+          var main = document.createElement("div");
+          var inp = document.createElement("input");
+          inp.type = "text";
+          inp.value = b.type === "vimeo" ? (b.id || "") : (b.src || "");
+          inp.placeholder = b.type === "vimeo" ? "例如 1134762428" : "https://…";
+          inp.addEventListener("input", function () {
+            if (b.type === "vimeo") b.id = inp.value.trim();
+            else b.src = inp.value.trim();
+            syncRaw();
+          });
+          main.appendChild(inp);
+          var actions = document.createElement("div");
+          actions.className = "block-actions";
+          function mv(delta) {
+            var j = idx + delta;
+            if (j < 0 || j >= blocks.length) return;
+            var t = blocks[idx];
+            blocks[idx] = blocks[j];
+            blocks[j] = t;
+            renderBlocks();
+            syncRaw();
+          }
+          var up = document.createElement("button");
+          up.type = "button";
+          up.textContent = "上移";
+          up.addEventListener("click", function () { mv(-1); });
+          var down = document.createElement("button");
+          down.type = "button";
+          down.textContent = "下移";
+          down.addEventListener("click", function () { mv(1); });
+          var del = document.createElement("button");
+          del.type = "button";
+          del.className = "danger";
+          del.textContent = "删除";
+          del.addEventListener("click", function () {
+            blocks.splice(idx, 1);
+            renderBlocks();
+            syncRaw();
+          });
+          actions.appendChild(up);
+          actions.appendChild(down);
+          actions.appendChild(del);
+          row.appendChild(typeEl);
+          row.appendChild(main);
+          row.appendChild(actions);
+          host.appendChild(row);
+        })(i);
+      }
+    }
+
+    function syncRaw() {
+      document.getElementById("raw-json").value = JSON.stringify(state, null, 2);
+    }
+
+    function applyFromRaw() {
+      try {
+        var data = JSON.parse(document.getElementById("raw-json").value);
+        state = ensureShape(data);
+        buildVimeoOptInputs();
+        renderBlocks();
+        setStatus("已从文本应用。");
+      } catch (e) {
+        setStatus("JSON 解析失败：" + (e.message || e), true);
+      }
+    }
+
+    function loadFromUrl() {
+      setStatus("正在加载…");
+      return fetch("projects.json")
+        .then(function (r) {
+          if (!r.ok) throw new Error("HTTP " + r.status);
+          return r.json();
+        })
+        .then(function (data) {
+          state = ensureShape(data);
+          buildVimeoOptInputs();
+          renderBlocks();
+          syncRaw();
+          setStatus("已加载 projects.json。");
+        })
+        .catch(function (e) {
+          setStatus("加载失败（本地打开文件时不可用）：" + (e.message || e), true);
+        });
+    }
+
+    document.getElementById("btn-reload").addEventListener("click", loadFromUrl);
+    document.getElementById("btn-download").addEventListener("click", function () {
+      syncRaw();
+      var blob = new Blob([document.getElementById("raw-json").value], { type: "application/json" });
+      var a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "projects.json";
+      a.click();
+      URL.revokeObjectURL(a.href);
+      setStatus("已下载。请将文件放到网站根目录并提交 Git。");
+    });
+    document.getElementById("btn-preset").addEventListener("click", function () {
+      state[PID].vimeoEmbedOptions = defaultVimeoOpts();
+      buildVimeoOptInputs();
+      syncRaw();
+      setStatus("已写入 Portfolio 默认 Vimeo 参数。");
+    });
+    document.getElementById("btn-add-image").addEventListener("click", function () {
+      state[PID].blocks.push({ type: "image", src: "" });
+      renderBlocks();
+      syncRaw();
+    });
+    document.getElementById("btn-add-vimeo").addEventListener("click", function () {
+      state[PID].blocks.push({ type: "vimeo", id: "" });
+      renderBlocks();
+      syncRaw();
+    });
+    document.getElementById("btn-apply-raw").addEventListener("click", applyFromRaw);
+    document.getElementById("file-import").addEventListener("change", function () {
+      var f = this.files && this.files[0];
+      if (!f) return;
+      var reader = new FileReader();
+      reader.onload = function () {
+        try {
+          var data = JSON.parse(reader.result);
+          state = ensureShape(data);
+          buildVimeoOptInputs();
+          renderBlocks();
+          syncRaw();
+          setStatus("已导入 " + f.name);
+        } catch (e) {
+          setStatus("导入失败：" + (e.message || e), true);
+        }
+      };
+      reader.readAsText(f);
+      this.value = "";
+    });
+
+    document.getElementById("raw-json").addEventListener("blur", function () {
+      /* 不自动解析，避免输入中途破坏 */
+    });
+
+    state = defaultState();
+    buildVimeoOptInputs();
+    renderBlocks();
+    syncRaw();
+    loadFromUrl();
+  </script>
+</body>
+</html>
