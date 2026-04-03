@@ -778,11 +778,11 @@
         },
         "chinese-style-ui-design": {
           title: "Chinese Style UI Design",
+          videosAfterImages: true,
           videos: ["uEeD9kzUXAQ"],
           images: [
             "https://cdn.myportfolio.com/197a6bd9-dcd9-42d3-8e20-5e24d83ae321/8a81cb66-1d03-41f8-8026-539a07b92a2e_rw_1200.jpg?h=5b1525fc8e9076c01ef70455bad678e2",
-            "https://cdn.myportfolio.com/197a6bd9-dcd9-42d3-8e20-5e24d83ae321/d2a5e884-b010-417e-b717-1741f4fed5ee_rw_1200.jpg?h=aebe6cbf76a79ea1be674674990b3d99",
-            "https://cdn.myportfolio.com/197a6bd9-dcd9-42d3-8e20-5e24d83ae321/a8a56ed6-e27c-45ba-aeba-0f6ebdfff4bd_rw_1200.jpg?h=53a3ce41e60934b601b00a42e8e2b46b"
+            "https://cdn.myportfolio.com/197a6bd9-dcd9-42d3-8e20-5e24d83ae321/d2a5e884-b010-417e-b717-1741f4fed5ee_rw_1200.jpg?h=aebe6cbf76a79ea1be674674990b3d99"
           ]
         },
         "phantom-tribe": {
@@ -927,6 +927,7 @@
       }
 
       function closeProjectView() {
+        bodyEl.innerHTML = "";
         detailEl.hidden = true;
         pageRoot.hidden = false;
         titleEl.textContent = "";
