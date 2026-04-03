@@ -383,24 +383,20 @@
 
     .detail-top {
       box-sizing: border-box;
-      display: flex;
-      flex-direction: row;
-      flex-wrap: nowrap;
-      align-items: center;
-      justify-content: flex-start;
-      gap: 0.35rem;
+      position: relative;
       min-height: 2.75rem;
       margin-bottom: clamp(1rem, 3vw, 1.5rem);
       padding: 0;
-      padding-left: var(--detail-back-pad);
-      text-align: center;
       width: 100%;
     }
 
     /* Fluid type: ~16px floor (mobile readability), scales down with viewport; WCAG has no px floor but 16px is widely used for body on phones */
     .detail-back-header {
-      position: relative;
-      flex: 0 0 auto;
+      position: absolute;
+      left: var(--detail-back-pad);
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 1;
       margin: 0;
       padding: 0;
       border: none;
@@ -418,11 +414,9 @@
     }
 
     .detail-project-title.name {
-      flex: 1 1 auto;
-      min-width: 0;
+      display: block;
+      width: 100%;
       margin: 0;
-      padding: 0;
-      max-width: 100%;
       box-sizing: border-box;
       text-align: center;
       transform: none;
@@ -431,6 +425,8 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      padding-left: max(3.25rem, calc(var(--detail-back-pad, 0px) + 3.25rem));
+      padding-right: max(3.25rem, calc(var(--detail-back-pad, 0px) + 3.25rem));
     }
 
     .detail-back-header:hover,
@@ -563,9 +559,13 @@
         padding-right: 0;
       }
 
-      .detail-top {
-        padding-left: calc(max(12px, env(safe-area-inset-left, 0px)) + var(--detail-back-pad, 0px));
-        padding-right: max(12px, env(safe-area-inset-right, 0px));
+      .detail-back-header {
+        left: calc(max(12px, env(safe-area-inset-left, 0px)) + var(--detail-back-pad, 0px));
+      }
+
+      .detail-project-title.name {
+        padding-left: max(3.25rem, calc(max(12px, env(safe-area-inset-left, 0px)) + var(--detail-back-pad, 0px) + 3.25rem));
+        padding-right: max(3.25rem, calc(max(12px, env(safe-area-inset-right, 0px)) + var(--detail-back-pad, 0px) + 3.25rem));
       }
 
       .detail-footer {
