@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="robots" content="noindex, nofollow" />
-  <title>内容管理 — Squid Game Unleashed</title>
+  <title>网站内容管理</title>
   <style>
     :root {
       --bg: #141414;
@@ -23,127 +23,197 @@
       font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
       font-size: 15px;
       line-height: 1.5;
-      padding: clamp(1rem, 4vw, 2rem);
+      padding: clamp(1rem, 3vw, 1.75rem);
+      max-width: 58rem;
     }
-    h1 { font-weight: 500; font-size: 1.35rem; margin: 0 0 0.5rem; }
-    p.intro { color: var(--muted); margin: 0 0 1.25rem; max-width: 52rem; }
+    h1 { font-weight: 500; font-size: 1.35rem; margin: 0 0 0.35rem; }
+    .sub { color: var(--muted); font-size: 0.92rem; margin: 0 0 1rem; max-width: 52rem; }
     a { color: var(--accent); }
-    .row { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; margin-bottom: 1rem; }
+    nav.tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem;
+      margin-bottom: 1rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.65rem;
+    }
+    nav.tabs button {
+      font: inherit;
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--muted);
+      padding: 0.35rem 0.65rem;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    nav.tabs button.is-active {
+      color: var(--text);
+      border-color: var(--border);
+      background: var(--btn);
+    }
+    section.tab-panel { display: none; }
+    section.tab-panel.is-visible { display: block; }
+    .panel {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1rem 1.1rem;
+      margin-bottom: 1rem;
+    }
+    .panel h2 { font-size: 1rem; margin: 0 0 0.65rem; font-weight: 600; }
+    .row { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; margin-bottom: 0.65rem; }
     button, .file-btn {
       font: inherit;
       border: 1px solid var(--border);
       background: var(--btn);
       color: var(--text);
-      padding: 0.45rem 0.85rem;
+      padding: 0.4rem 0.8rem;
       border-radius: 6px;
       cursor: pointer;
     }
-    button:hover, .file-btn:hover { border-color: rgba(242,236,228,0.35); }
+    button:hover { border-color: rgba(242,236,228,0.35); }
     button.danger { border-color: #6b3030; color: #e8a0a0; }
-    input[type="text"], textarea {
+    input[type="text"], textarea, select {
       font: inherit;
       background: #1e1e1e;
       border: 1px solid var(--border);
       color: var(--text);
       border-radius: 6px;
-      padding: 0.4rem 0.6rem;
+      padding: 0.4rem 0.55rem;
       width: 100%;
       max-width: 100%;
     }
-    textarea { min-height: 220px; font-family: ui-monospace, monospace; font-size: 13px; }
-    .panel {
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 1rem 1.1rem;
-      margin-bottom: 1.25rem;
-      max-width: 56rem;
+    textarea { min-height: 120px; font-family: ui-monospace, monospace; font-size: 13px; }
+    #raw-json { min-height: 320px; }
+    .file-btn input { display: none; }
+    label.chk { display: flex; align-items: center; gap: 0.4rem; font-size: 14px; cursor: pointer; }
+    .opts { display: grid; grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr)); gap: 0.4rem 1rem; }
+    .work-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1.2fr auto;
+      gap: 0.4rem;
+      align-items: start;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
     }
-    .panel h2 { font-size: 1rem; margin: 0 0 0.75rem; font-weight: 600; }
+    .work-row:last-child { border-bottom: 0; }
+    .work-actions { display: flex; flex-direction: column; gap: 0.2rem; }
+    .work-actions button { padding: 0.2rem 0.4rem; font-size: 12px; }
+    .status { font-size: 13px; color: var(--muted); min-height: 1.25rem; margin-top: 0.35rem; }
+    .status.err { color: #e8a0a0; }
+    .hint { font-size: 12px; color: var(--muted); margin-top: 0.25rem; }
     .block-item {
       display: grid;
-      grid-template-columns: 5rem 1fr auto;
-      gap: 0.5rem;
-      align-items: start;
-      padding: 0.65rem 0;
+      grid-template-columns: 4.5rem 1fr auto;
+      gap: 0.4rem;
+      padding: 0.45rem 0;
       border-bottom: 1px solid var(--border);
+      font-size: 13px;
     }
-    .block-item:last-child { border-bottom: 0; }
-    .block-type { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; padding-top: 0.35rem; }
-    .block-actions { display: flex; flex-direction: column; gap: 0.25rem; }
-    .block-actions button { padding: 0.25rem 0.45rem; font-size: 12px; }
-    .opts {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
-      gap: 0.5rem 1rem;
-      margin-top: 0.5rem;
-    }
-    label.chk { display: flex; align-items: center; gap: 0.4rem; font-size: 14px; cursor: pointer; }
-    .status { font-size: 13px; color: var(--muted); margin-top: 0.5rem; min-height: 1.25rem; }
-    .status.err { color: #e8a0a0; }
-    .file-btn { display: inline-block; }
-    .file-btn input { display: none; }
+    .block-type { color: var(--muted); text-transform: uppercase; font-size: 11px; padding-top: 0.3rem; letter-spacing: 0.04em; }
   </style>
 </head>
 <body>
-  <h1>内容管理 · Squid Game Unleashed</h1>
-  <p class="intro">
-    此页面用于编辑 <code>projects.json</code> 中的<strong>图片顺序与 Vimeo ID</strong>，以及复刻
-    <a href="https://bairdwang.myportfolio.com/squid-game-unleashed" target="_blank" rel="noopener">Adobe Portfolio</a>
-    的 Vimeo 参数。本站不会把文件上传到服务器：图片需使用可访问的 URL（例如 CDN / MyPortfolio）。
-    编辑完成后请<strong>下载 JSON</strong>，覆盖仓库根目录的 <code>projects.json</code> 并推送至 GitHub。
+  <h1>网站内容管理</h1>
+  <p class="sub">
+    编辑 <code>site-data.json</code>：首页作品网格（类似 Adobe Portfolio 的 <a href="https://portfolio.adobe.com/197a6bd9-dcd9-42d3-8e20-5e24d83ae321/editor/work" target="_blank" rel="noopener">Work</a>）、联系区，以及各项目详情（类似
+    <a href="https://portfolio.adobe.com/197a6bd9-dcd9-42d3-8e20-5e24d83ae321/editor/squid-game-unleashed" target="_blank" rel="noopener">单页编辑器</a>）。
+    图片文件需放在仓库 <code>assets/img/</code> 等目录，此处只填写相对路径（如 <code>assets/img/xxx.jpg</code>）。完成后下载 JSON 并提交到 GitHub。
     <a href="index.html">返回首页</a>
   </p>
 
-  <div class="panel">
-    <h2>操作</h2>
-    <div class="row">
-      <button type="button" id="btn-reload">从站点重新加载 projects.json</button>
-      <label class="file-btn">
-        导入 JSON
-        <input type="file" id="file-import" accept=".json,application/json" />
-      </label>
-      <button type="button" id="btn-download">下载 projects.json</button>
-      <button type="button" id="btn-preset">写入 Portfolio 默认 Vimeo 参数</button>
-    </div>
-    <div class="status" id="status"></div>
-  </div>
+  <nav class="tabs" role="tablist">
+    <button type="button" class="is-active" data-tab="actions" role="tab">文件</button>
+    <button type="button" data-tab="home" role="tab">首页作品</button>
+    <button type="button" data-tab="contact" role="tab">首页与联系</button>
+    <button type="button" data-tab="project" role="tab">项目详情</button>
+    <button type="button" data-tab="json" role="tab">原始 JSON</button>
+  </nav>
 
-  <div class="panel">
-    <h2>Vimeo 嵌入参数（与 Adobe Portfolio 一致）</h2>
-    <div class="opts" id="vimeo-opts"></div>
-  </div>
-
-  <div class="panel">
-    <h2>内容块顺序（上图 · 下一条可为 Vimeo）</h2>
-    <div class="row">
-      <button type="button" id="btn-add-image">＋ 图片 URL</button>
-      <button type="button" id="btn-add-vimeo">＋ Vimeo 视频 ID</button>
+  <section id="panel-actions" class="tab-panel is-visible" role="tabpanel">
+    <div class="panel">
+      <h2>加载 / 导出</h2>
+      <div class="row">
+        <button type="button" id="btn-reload">从站点加载 site-data.json</button>
+        <label class="file-btn">导入 JSON<input type="file" id="file-import" accept=".json,application/json" /></label>
+        <button type="button" id="btn-download">下载 site-data.json</button>
+      </div>
+      <p class="hint">静态托管无法直接上传二进制；请将新图片放入本地 <code>assets/img/</code> 后提交仓库，再在此填写路径。</p>
+      <div class="status" id="status"></div>
     </div>
-    <div id="blocks"></div>
-  </div>
+  </section>
 
-  <div class="panel">
-    <h2>原始 JSON（可手动改）</h2>
-    <textarea id="raw-json" spellcheck="false"></textarea>
-    <div class="row" style="margin-top: 0.75rem;">
-      <button type="button" id="btn-apply-raw">从上方文本应用</button>
+  <section id="panel-home" class="tab-panel" role="tabpanel">
+    <div class="panel">
+      <h2>首页作品顺序与缩略图</h2>
+      <div class="row">
+        <button type="button" id="btn-add-work">＋ 作品条目</button>
+      </div>
+      <div id="home-work-rows"></div>
     </div>
-  </div>
+  </section>
+
+  <section id="panel-contact" class="tab-panel" role="tabpanel">
+    <div class="panel">
+      <h2>站点标题与联系</h2>
+      <label>首页大标题（Baird Wang）</label>
+      <input type="text" id="site-header-name" placeholder="Baird Wang" />
+      <p class="hint" style="margin-top:0.75rem">联系区</p>
+      <label>引言</label>
+      <textarea id="contact-lede" rows="3"></textarea>
+      <label style="margin-top:0.5rem;display:block">邮箱</label>
+      <input type="text" id="contact-email" />
+    </div>
+  </section>
+
+  <section id="panel-project" class="tab-panel" role="tabpanel">
+    <div class="panel">
+      <h2>选择项目</h2>
+      <select id="project-select"></select>
+      <p class="hint">标题、备注、图片列表与 YouTube；若使用「内容块」模式（如 Squid 穿插 Vimeo），在下方块区编辑。</p>
+      <label style="margin-top:0.75rem;display:block">标题</label>
+      <input type="text" id="p-title" />
+      <label style="margin-top:0.5rem;display:block">备注（可选，支持纯文本）</label>
+      <textarea id="p-note" rows="2"></textarea>
+      <label class="chk" style="margin-top:0.5rem"><input type="checkbox" id="p-videos-after" /> YouTube 放在图片之后</label>
+      <label style="margin-top:0.5rem;display:block">YouTube 视频 ID（逗号分隔）</label>
+      <input type="text" id="p-videos" placeholder="ewXXN0S81_Q, SDhmRwPpd_c" />
+      <label style="margin-top:0.5rem;display:block">图片路径（每行一条，相对站点根目录）</label>
+      <textarea id="p-images" rows="8"></textarea>
+      <h2 style="margin-top:1rem">内容块（图片 / Vimeo 穿插）</h2>
+      <p class="hint">若定义了块，前台优先显示块；可与上方图片列表同时保留作备份。</p>
+      <label class="chk"><input type="checkbox" id="p-use-blocks" /> 启用块编辑器</label>
+      <div id="vimeo-opts" class="opts" style="margin-top:0.5rem"></div>
+      <div class="row" style="margin-top:0.5rem">
+        <button type="button" id="btn-add-img-block">＋ 图片块</button>
+        <button type="button" id="btn-add-vimeo-block">＋ Vimeo 块</button>
+      </div>
+      <div id="block-list"></div>
+    </div>
+  </section>
+
+  <section id="panel-json" class="tab-panel" role="tabpanel">
+    <div class="panel">
+      <h2>site-data.json</h2>
+      <textarea id="raw-json" spellcheck="false"></textarea>
+      <div class="row" style="margin-top:0.5rem">
+        <button type="button" id="btn-apply-raw">从文本应用</button>
+      </div>
+    </div>
+  </section>
 
   <script>
-    var PID = "squid-game-unleashed";
-    var state = {};
-
-    var OPT_DEF = [
+    var siteData = { version: 1, site: {}, home: { contact: {}, work: [] }, projects: {} };
+    var VIMEO_OPT_DEF = [
       ["autoplay", "自动播放", true],
       ["muted", "静音", true],
       ["loop", "循环", true],
-      ["autopause", "其他视频播放时暂停（Portfolio 为关闭）", false],
+      ["autopause", "多视频时自动暂停", false],
       ["controls", "控制条", true],
       ["title", "显示标题", false],
       ["byline", "显示作者行", false],
       ["portrait", "显示作者头像", false],
-      ["playsinline", "内联播放（移动端）", true]
+      ["playsinline", "内联播放", true]
     ];
 
     function setStatus(msg, isErr) {
@@ -154,49 +224,54 @@
 
     function defaultVimeoOpts() {
       var o = {};
-      for (var i = 0; i < OPT_DEF.length; i++) {
-        o[OPT_DEF[i][0]] = OPT_DEF[i][2];
-      }
+      for (var i = 0; i < VIMEO_OPT_DEF.length; i++) o[VIMEO_OPT_DEF[i][0]] = VIMEO_OPT_DEF[i][2];
       return o;
     }
 
-    function defaultState() {
-      var base = {};
-      base[PID] = {
-        vimeoEmbedOptions: defaultVimeoOpts(),
-        blocks: []
-      };
-      return base;
+    function ensureShape(d) {
+      if (!d || typeof d !== "object") d = {};
+      d.version = d.version || 1;
+      d.site = d.site || {};
+      d.home = d.home || {};
+      d.home.contact = d.home.contact || {};
+      d.home.work = Array.isArray(d.home.work) ? d.home.work : [];
+      d.projects = d.projects && typeof d.projects === "object" ? d.projects : {};
+      return d;
     }
 
-    function deepClone(x) {
-      return JSON.parse(JSON.stringify(x));
+    function syncRaw() {
+      document.getElementById("raw-json").value = JSON.stringify(siteData, null, 2);
     }
 
-    function ensureShape(data) {
-      if (!data || typeof data !== "object") data = {};
-      if (!data[PID] || typeof data[PID] !== "object") data[PID] = {};
-      if (!data[PID].vimeoEmbedOptions || typeof data[PID].vimeoEmbedOptions !== "object") {
-        data[PID].vimeoEmbedOptions = defaultVimeoOpts();
-      } else {
-        var d = defaultVimeoOpts();
-        for (var k in d) {
-          if (!Object.prototype.hasOwnProperty.call(data[PID].vimeoEmbedOptions, k)) {
-            data[PID].vimeoEmbedOptions[k] = d[k];
-          }
-        }
-      }
-      if (!Array.isArray(data[PID].blocks)) data[PID].blocks = [];
-      return data;
+    function currentProjectId() {
+      return document.getElementById("project-select").value;
     }
 
-    function buildVimeoOptInputs() {
+    function ensureProject(pid) {
+      if (!siteData.projects[pid]) siteData.projects[pid] = { title: pid, videos: [], images: [] };
+      return siteData.projects[pid];
+    }
+
+    function fillProjectForm() {
+      var pid = currentProjectId();
+      var p = ensureProject(pid);
+      document.getElementById("p-title").value = p.title || "";
+      document.getElementById("p-note").value = p.note || "";
+      document.getElementById("p-videos-after").checked = !!p.videosAfterImages;
+      document.getElementById("p-videos").value = (p.videos || []).join(", ");
+      document.getElementById("p-images").value = (p.images || []).join("\n");
+      var hasBlocks = !!(p.blocks && p.blocks.length);
+      document.getElementById("p-use-blocks").checked = hasBlocks || !!(p.vimeoEmbedOptions && Object.keys(p.vimeoEmbedOptions).length);
+      p.vimeoEmbedOptions = p.vimeoEmbedOptions || defaultVimeoOpts();
+      buildVimeoOpts(p.vimeoEmbedOptions);
+      renderBlockList(pid);
+    }
+
+    function buildVimeoOpts(opts) {
       var host = document.getElementById("vimeo-opts");
       host.innerHTML = "";
-      var opts = state[PID].vimeoEmbedOptions;
-      for (var i = 0; i < OPT_DEF.length; i++) {
-        var key = OPT_DEF[i][0];
-        var label = OPT_DEF[i][1];
+      for (var i = 0; i < VIMEO_OPT_DEF.length; i++) {
+        var key = VIMEO_OPT_DEF[i][0];
         var lab = document.createElement("label");
         lab.className = "chk";
         var cb = document.createElement("input");
@@ -204,47 +279,51 @@
         cb.dataset.key = key;
         cb.checked = !!opts[key];
         cb.addEventListener("change", function () {
-          state[PID].vimeoEmbedOptions[this.dataset.key] = this.checked;
+          var id = currentProjectId();
+          var pr = ensureProject(id);
+          pr.vimeoEmbedOptions = pr.vimeoEmbedOptions || defaultVimeoOpts();
+          pr.vimeoEmbedOptions[this.dataset.key] = this.checked;
           syncRaw();
         });
         lab.appendChild(cb);
-        lab.appendChild(document.createTextNode(label));
+        lab.appendChild(document.createTextNode(VIMEO_OPT_DEF[i][1]));
         host.appendChild(lab);
       }
     }
 
-    function renderBlocks() {
-      var host = document.getElementById("blocks");
+    function renderBlockList(pid) {
+      var p = ensureProject(pid);
+      var host = document.getElementById("block-list");
       host.innerHTML = "";
-      var blocks = state[PID].blocks;
+      if (!document.getElementById("p-use-blocks").checked) return;
+      p.blocks = Array.isArray(p.blocks) ? p.blocks : [];
+      var blocks = p.blocks;
       for (var i = 0; i < blocks.length; i++) {
         (function (idx) {
           var b = blocks[idx];
           var row = document.createElement("div");
           row.className = "block-item";
-          var typeEl = document.createElement("div");
-          typeEl.className = "block-type";
-          typeEl.textContent = b.type === "vimeo" ? "Vimeo" : "图片";
-          var main = document.createElement("div");
-          var inp = document.createElement("input");
-          inp.type = "text";
-          inp.value = b.type === "vimeo" ? (b.id || "") : (b.src || "");
-          inp.placeholder = b.type === "vimeo" ? "例如 1134762428" : "https://…";
-          inp.addEventListener("input", function () {
-            if (b.type === "vimeo") b.id = inp.value.trim();
-            else b.src = inp.value.trim();
+          var t = document.createElement("div");
+          t.className = "block-type";
+          t.textContent = b.type === "vimeo" ? "Vimeo" : "图片";
+          var main = document.createElement("input");
+          main.type = "text";
+          main.value = b.type === "vimeo" ? (b.id || "") : (b.src || "");
+          main.placeholder = b.type === "vimeo" ? "Vimeo ID" : "assets/img/…";
+          main.addEventListener("input", function () {
+            if (b.type === "vimeo") b.id = main.value.trim();
+            else b.src = main.value.trim();
             syncRaw();
           });
-          main.appendChild(inp);
-          var actions = document.createElement("div");
-          actions.className = "block-actions";
-          function mv(delta) {
-            var j = idx + delta;
+          var act = document.createElement("div");
+          act.className = "work-actions";
+          function mv(d) {
+            var j = idx + d;
             if (j < 0 || j >= blocks.length) return;
-            var t = blocks[idx];
+            var tmp = blocks[idx];
             blocks[idx] = blocks[j];
-            blocks[j] = t;
-            renderBlocks();
+            blocks[j] = tmp;
+            renderBlockList(pid);
             syncRaw();
           }
           var up = document.createElement("button");
@@ -261,52 +340,212 @@
           del.textContent = "删除";
           del.addEventListener("click", function () {
             blocks.splice(idx, 1);
-            renderBlocks();
+            renderBlockList(pid);
+            syncRaw();
+          });
+          act.appendChild(up);
+          act.appendChild(down);
+          act.appendChild(del);
+          row.appendChild(t);
+          row.appendChild(main);
+          row.appendChild(act);
+          host.appendChild(row);
+        })(i);
+      }
+    }
+
+    function renderHomeRows() {
+      var host = document.getElementById("home-work-rows");
+      host.innerHTML = "";
+      var work = siteData.home.work;
+      for (var i = 0; i < work.length; i++) {
+        (function (idx) {
+          var w = work[idx];
+          var row = document.createElement("div");
+          row.className = "work-row";
+          function field(label, key, ph) {
+            var wrap = document.createElement("div");
+            var lb = document.createElement("label");
+            lb.style.fontSize = "11px";
+            lb.style.color = "var(--muted)";
+            lb.textContent = label;
+            var el = document.createElement("input");
+            el.type = "text";
+            el.placeholder = ph || "";
+            el.value = w[key] || "";
+            el.addEventListener("input", function () {
+              w[key] = el.value;
+              syncRaw();
+            });
+            wrap.appendChild(lb);
+            wrap.appendChild(el);
+            return wrap;
+          }
+          row.appendChild(field("ID", "id", "squid-game-unleashed"));
+          row.appendChild(field("标题", "caption", ""));
+          var col = document.createElement("div");
+          col.appendChild(field("缩略图", "thumb", "assets/img/…"));
+          col.appendChild(field("alt", "alt", ""));
+          row.appendChild(col);
+          var actions = document.createElement("div");
+          actions.className = "work-actions";
+          function mv(d) {
+            var j = idx + d;
+            if (j < 0 || j >= work.length) return;
+            var t = work[idx];
+            work[idx] = work[j];
+            work[j] = t;
+            renderHomeRows();
+            syncRaw();
+          }
+          var up = document.createElement("button");
+          up.type = "button";
+          up.textContent = "上移";
+          up.addEventListener("click", function () { mv(-1); });
+          var down = document.createElement("button");
+          down.type = "button";
+          down.textContent = "下移";
+          down.addEventListener("click", function () { mv(1); });
+          var del = document.createElement("button");
+          del.type = "button";
+          del.className = "danger";
+          del.textContent = "删除";
+          del.addEventListener("click", function () {
+            work.splice(idx, 1);
+            renderHomeRows();
             syncRaw();
           });
           actions.appendChild(up);
           actions.appendChild(down);
           actions.appendChild(del);
-          row.appendChild(typeEl);
-          row.appendChild(main);
           row.appendChild(actions);
           host.appendChild(row);
         })(i);
       }
     }
 
-    function syncRaw() {
-      document.getElementById("raw-json").value = JSON.stringify(state, null, 2);
+    function fillContactForm() {
+      document.getElementById("site-header-name").value = (siteData.site && siteData.site.headerName) || "";
+      document.getElementById("contact-lede").value = (siteData.home.contact && siteData.home.contact.lede) || "";
+      document.getElementById("contact-email").value = (siteData.home.contact && siteData.home.contact.email) || "";
     }
 
-    function applyFromRaw() {
-      try {
-        var data = JSON.parse(document.getElementById("raw-json").value);
-        state = ensureShape(data);
-        buildVimeoOptInputs();
-        renderBlocks();
-        setStatus("已从文本应用。");
-      } catch (e) {
-        setStatus("JSON 解析失败：" + (e.message || e), true);
+    function fillProjectSelect() {
+      var sel = document.getElementById("project-select");
+      var keys = Object.keys(siteData.projects).sort();
+      sel.innerHTML = "";
+      for (var i = 0; i < keys.length; i++) {
+        var o = document.createElement("option");
+        o.value = keys[i];
+        o.textContent = (siteData.projects[keys[i]].title || keys[i]) + " (" + keys[i] + ")";
+        sel.appendChild(o);
       }
     }
 
+    function wireContactInputs() {
+      document.getElementById("site-header-name").addEventListener("input", function () {
+        siteData.site = siteData.site || {};
+        siteData.site.headerName = this.value;
+        syncRaw();
+      });
+      document.getElementById("contact-lede").addEventListener("input", function () {
+        siteData.home.contact = siteData.home.contact || {};
+        siteData.home.contact.lede = this.value;
+        syncRaw();
+      });
+      document.getElementById("contact-email").addEventListener("input", function () {
+        siteData.home.contact = siteData.home.contact || {};
+        siteData.home.contact.email = this.value;
+        syncRaw();
+      });
+    }
+
+    function wireProjectInputs() {
+      document.getElementById("project-select").addEventListener("change", fillProjectForm);
+      document.getElementById("p-title").addEventListener("input", function () {
+        var p = ensureProject(currentProjectId());
+        p.title = this.value;
+        fillProjectSelect();
+        syncRaw();
+      });
+      document.getElementById("p-note").addEventListener("input", function () {
+        ensureProject(currentProjectId()).note = this.value;
+        syncRaw();
+      });
+      document.getElementById("p-videos-after").addEventListener("change", function () {
+        ensureProject(currentProjectId()).videosAfterImages = this.checked;
+        syncRaw();
+      });
+      document.getElementById("p-videos").addEventListener("input", function () {
+        var p = ensureProject(currentProjectId());
+        p.videos = this.value.split(/[,\s]+/).map(function (s) { return s.trim(); }).filter(Boolean);
+        syncRaw();
+      });
+      document.getElementById("p-images").addEventListener("input", function () {
+        var p = ensureProject(currentProjectId());
+        p.images = this.value.split("\n").map(function (s) { return s.trim(); }).filter(Boolean);
+        syncRaw();
+      });
+      document.getElementById("p-use-blocks").addEventListener("change", function () {
+        var p = ensureProject(currentProjectId());
+        if (!this.checked) {
+          /* keep blocks in JSON but hide editor — optional: clear */
+        } else {
+          if (!p.blocks || !p.blocks.length) p.blocks = [];
+          p.vimeoEmbedOptions = p.vimeoEmbedOptions || defaultVimeoOpts();
+        }
+        renderBlockList(currentProjectId());
+        syncRaw();
+      });
+      document.getElementById("btn-add-img-block").addEventListener("click", function () {
+        var p = ensureProject(currentProjectId());
+        p.blocks = p.blocks || [];
+        p.blocks.push({ type: "image", src: "" });
+        document.getElementById("p-use-blocks").checked = true;
+        renderBlockList(currentProjectId());
+        syncRaw();
+      });
+      document.getElementById("btn-add-vimeo-block").addEventListener("click", function () {
+        var p = ensureProject(currentProjectId());
+        p.blocks = p.blocks || [];
+        p.blocks.push({ type: "vimeo", id: "" });
+        document.getElementById("p-use-blocks").checked = true;
+        p.vimeoEmbedOptions = p.vimeoEmbedOptions || defaultVimeoOpts();
+        renderBlockList(currentProjectId());
+        syncRaw();
+      });
+    }
+
+    function wireTabs() {
+      document.querySelectorAll("nav.tabs button").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          var id = btn.getAttribute("data-tab");
+          document.querySelectorAll("nav.tabs button").forEach(function (b) { b.classList.remove("is-active"); });
+          document.querySelectorAll("section.tab-panel").forEach(function (p) { p.classList.remove("is-visible"); });
+          btn.classList.add("is-active");
+          document.getElementById("panel-" + id).classList.add("is-visible");
+        });
+      });
+    }
+
     function loadFromUrl() {
-      setStatus("正在加载…");
-      return fetch("projects.json")
+      setStatus("加载中…");
+      return fetch("site-data.json")
         .then(function (r) {
           if (!r.ok) throw new Error("HTTP " + r.status);
           return r.json();
         })
         .then(function (data) {
-          state = ensureShape(data);
-          buildVimeoOptInputs();
-          renderBlocks();
+          siteData = ensureShape(data);
+          fillContactForm();
+          fillProjectSelect();
+          fillProjectForm();
+          renderHomeRows();
           syncRaw();
-          setStatus("已加载 projects.json。");
+          setStatus("已加载 site-data.json");
         })
         .catch(function (e) {
-          setStatus("加载失败（本地打开文件时不可用）：" + (e.message || e), true);
+          setStatus("加载失败（本地打开 file:// 时常失败）：" + (e.message || e), true);
         });
     }
 
@@ -316,55 +555,57 @@
       var blob = new Blob([document.getElementById("raw-json").value], { type: "application/json" });
       var a = document.createElement("a");
       a.href = URL.createObjectURL(blob);
-      a.download = "projects.json";
+      a.download = "site-data.json";
       a.click();
       URL.revokeObjectURL(a.href);
-      setStatus("已下载。请将文件放到网站根目录并提交 Git。");
+      setStatus("已下载 site-data.json，请覆盖仓库根目录文件并 git push。");
     });
-    document.getElementById("btn-preset").addEventListener("click", function () {
-      state[PID].vimeoEmbedOptions = defaultVimeoOpts();
-      buildVimeoOptInputs();
-      syncRaw();
-      setStatus("已写入 Portfolio 默认 Vimeo 参数。");
-    });
-    document.getElementById("btn-add-image").addEventListener("click", function () {
-      state[PID].blocks.push({ type: "image", src: "" });
-      renderBlocks();
-      syncRaw();
-    });
-    document.getElementById("btn-add-vimeo").addEventListener("click", function () {
-      state[PID].blocks.push({ type: "vimeo", id: "" });
-      renderBlocks();
-      syncRaw();
-    });
-    document.getElementById("btn-apply-raw").addEventListener("click", applyFromRaw);
     document.getElementById("file-import").addEventListener("change", function () {
       var f = this.files && this.files[0];
       if (!f) return;
       var reader = new FileReader();
       reader.onload = function () {
         try {
-          var data = JSON.parse(reader.result);
-          state = ensureShape(data);
-          buildVimeoOptInputs();
-          renderBlocks();
+          siteData = ensureShape(JSON.parse(reader.result));
+          fillContactForm();
+          fillProjectSelect();
+          fillProjectForm();
+          renderHomeRows();
           syncRaw();
           setStatus("已导入 " + f.name);
         } catch (e) {
-          setStatus("导入失败：" + (e.message || e), true);
+          setStatus("解析失败：" + e.message, true);
         }
       };
       reader.readAsText(f);
       this.value = "";
     });
-
-    document.getElementById("raw-json").addEventListener("blur", function () {
-      /* 不自动解析，避免输入中途破坏 */
+    document.getElementById("btn-apply-raw").addEventListener("click", function () {
+      try {
+        siteData = ensureShape(JSON.parse(document.getElementById("raw-json").value));
+        fillContactForm();
+        fillProjectSelect();
+        fillProjectForm();
+        renderHomeRows();
+        setStatus("已从 JSON 应用");
+      } catch (e) {
+        setStatus("JSON 错误：" + e.message, true);
+      }
+    });
+    document.getElementById("btn-add-work").addEventListener("click", function () {
+      siteData.home.work.push({ id: "", caption: "", thumb: "", alt: "" });
+      renderHomeRows();
+      syncRaw();
     });
 
-    state = defaultState();
-    buildVimeoOptInputs();
-    renderBlocks();
+    wireTabs();
+    wireContactInputs();
+    wireProjectInputs();
+    siteData = ensureShape(siteData);
+    fillContactForm();
+    fillProjectSelect();
+    fillProjectForm();
+    renderHomeRows();
     syncRaw();
     loadFromUrl();
   </script>
