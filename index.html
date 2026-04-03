@@ -378,6 +378,7 @@
       max-width: var(--detail-img-w);
       margin: 0 auto;
       padding: clamp(1.25rem, 4vw, 2rem) 0 clamp(3rem, 8vw, 5rem);
+      --detail-back-pad: 0px;
     }
 
     .detail-top {
@@ -391,6 +392,7 @@
       min-height: 2.75rem;
       margin-bottom: clamp(1rem, 3vw, 1.5rem);
       padding: 0;
+      padding-left: var(--detail-back-pad);
       text-align: center;
       width: 100%;
     }
@@ -454,7 +456,7 @@
       margin: 0;
       display: flex;
       flex-direction: column;
-      align-items: flex-start;
+      align-items: center;
       text-align: left;
     }
 
@@ -506,7 +508,7 @@
       font-size: 0.9375rem;
       line-height: 1.6;
       color: var(--text-muted);
-      align-self: stretch;
+      align-self: center;
       width: min(100%, var(--detail-img-w));
     }
 
@@ -516,7 +518,7 @@
       width: min(100%, var(--detail-img-w));
       max-width: min(100%, var(--detail-img-w));
       margin: 0;
-      margin-inline: 0;
+      margin-inline: auto;
       aspect-ratio: 16 / 9;
       overflow: hidden;
       background: #111;
@@ -536,7 +538,7 @@
       max-width: min(100%, var(--detail-img-w));
       width: -moz-fit-content;
       width: fit-content;
-      margin-inline: 0;
+      margin-inline: auto;
     }
 
     .detail-figure img {
@@ -561,7 +563,11 @@
         padding-right: 0;
       }
 
-      .detail-top,
+      .detail-top {
+        padding-left: calc(max(12px, env(safe-area-inset-left, 0px)) + var(--detail-back-pad, 0px));
+        padding-right: max(12px, env(safe-area-inset-right, 0px));
+      }
+
       .detail-footer {
         padding-left: max(12px, env(safe-area-inset-left, 0px));
         padding-right: max(12px, env(safe-area-inset-right, 0px));
@@ -891,13 +897,17 @@
       function syncDetailVideoWidths() {
         if (detailEl.hidden) return;
         var vids = bodyEl.querySelectorAll(".detail-video");
-        if (!vids.length) return;
+        if (!vids.length) {
+          syncDetailBackPad();
+          return;
+        }
         var narrow = bodyEl.clientWidth <= detailMobileMaxPx;
         if (narrow) {
           for (var z = 0; z < vids.length; z++) {
             vids[z].style.width = "";
             vids[z].style.maxWidth = "";
           }
+          syncDetailBackPad();
           return;
         }
         var imgs = bodyEl.querySelectorAll(".detail-figure img");
@@ -912,11 +922,33 @@
           vids[j].style.width = w + "px";
           vids[j].style.maxWidth = "100%";
         }
+        syncDetailBackPad();
+      }
+
+      function syncDetailBackPad() {
+        var inner = bodyEl.parentElement;
+        if (!inner || !inner.classList.contains("detail-inner")) return;
+        if (detailEl.hidden) {
+          inner.style.setProperty("--detail-back-pad", "0px");
+          return;
+        }
+        var media = bodyEl.querySelector(".detail-figure, .detail-video");
+        if (!media) {
+          inner.style.setProperty("--detail-back-pad", "0px");
+          return;
+        }
+        var ir = inner.getBoundingClientRect();
+        var mr = media.getBoundingClientRect();
+        var pad = mr.left - ir.left;
+        if (!isFinite(pad) || pad < 0) pad = 0;
+        if (pad > ir.width) pad = 0;
+        inner.style.setProperty("--detail-back-pad", Math.round(pad) + "px");
       }
 
       function bindDetailImgLoadsForVideoSync() {
         function onImg() {
           syncDetailVideoWidths();
+          syncDetailBackPad();
         }
         var imgs = bodyEl.querySelectorAll(".detail-figure img");
         for (var i = 0; i < imgs.length; i++) {
@@ -929,7 +961,10 @@
 
       window.addEventListener("resize", function () {
         window.clearTimeout(detailResizeTimer);
-        detailResizeTimer = window.setTimeout(syncDetailVideoWidths, 80);
+        detailResizeTimer = window.setTimeout(function () {
+          syncDetailVideoWidths();
+          syncDetailBackPad();
+        }, 80);
       });
 
       function renderProject(id) {
@@ -969,6 +1004,12 @@
           }
         }
         bodyEl.innerHTML = html;
+        requestAnimationFrame(function () {
+          requestAnimationFrame(function () {
+            syncDetailVideoWidths();
+            syncDetailBackPad();
+          });
+        });
       }
 
       function openProjectView() {
@@ -979,6 +1020,10 @@
       }
 
       function closeProjectView() {
+        var inner = bodyEl.parentElement;
+        if (inner && inner.classList.contains("detail-inner")) {
+          inner.style.setProperty("--detail-back-pad", "0px");
+        }
         bodyEl.innerHTML = "";
         detailEl.hidden = true;
         pageRoot.hidden = false;
