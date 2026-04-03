@@ -384,6 +384,9 @@
     .detail-top {
       box-sizing: border-box;
       position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       min-height: 2.75rem;
       margin-bottom: clamp(1rem, 3vw, 1.5rem);
       padding: 0;
@@ -415,7 +418,10 @@
 
     .detail-project-title.name {
       display: block;
+      flex: 1 1 auto;
+      align-self: center;
       width: 100%;
+      min-width: 0;
       margin: 0;
       box-sizing: border-box;
       text-align: center;
